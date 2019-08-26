@@ -571,7 +571,7 @@ void GAlign::OutputLocalAlignment(ostream &outputStream)
     aligntype<<'\0';
     if (good)
     {
-        outputStream << s1align.str() << endl << aligntype.str() << endl << s2align.str() << endl << flush;
+        //outputStream << s1align.str() << endl << aligntype.str() << endl << s2align.str() << endl << flush;
     }
     else
         outputStream<<"Alignment Error!"<<endl<<flush;
