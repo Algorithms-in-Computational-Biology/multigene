@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style> 
+input[type=text] {
+    width: 5%;
+}
+
+textarea {
+    width: 30%;
+    height: 150px;
+}
+
+li {
+    color: #FF0000;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Primer Design</h2>
+
+<form action="/primer-design" method="post">
+
+  {% if form.errors %}
+    <ul>
+        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+  {% endif %}
+  
+  <!--div id="type">
+    {{ form.pcr_type.label }}<br>
+    {{ form.pcr_type }}
+
+  </div><br-->
+  
+  <div id="input">
+    {{ form.sequence.label }}<br>	
+    {{ form.sequence }}
+  </div>
+  
+  <div id="settings">
+    <h4>Settings</h4>
+  <div>	
+    Primer length:
+  <div>
+    {{ form.min_length.label }}
+    {{ form.min_length }}
+    <!--{{ form.opt_length.label }}
+    {{ form.opt_length }}-->
+    {{ form.max_length.label }}
+    {{ form.max_length }}
+  </div>
+  </div><br>
+  
+  <div>	
+    GC content (&#37;):
+  <div>
+    {{ form.min_content.label }}	
+    {{ form.min_content }}
+    <!--{{ form.opt_content.label }}
+    {{ form.opt_content }}-->
+    {{ form.max_content.label }}
+    {{ form.max_content }}
+  </div>
+  </div><br>
+  
+  <div>	
+    Melting temperature (&#176;C):
+  <div>
+    {{ form.min_tm.label }}
+    {{ form.min_tm }}
+    <!--{{ form.opt_tm.label }}
+    {{ form.opt_tm }}-->
+    {{ form.max_tm.label }}
+    {{ form.max_tm }}
+  </div>
+  </div><br>
+
+  <div>	
+    {{ form.product_length.label }}	
+  <div>
+    {{ form.product_length }}
+  </div>
+  </div>
+
+</div>
+  
+  <br><br>
+  <input type="submit" value="Submit">
+</form> 
+
+</body>
+</html>
+

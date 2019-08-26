@@ -1,0 +1,10 @@
+g++ -c -O3 -Wno-deprecated -Wall -fpic teste.c
+g++ -shared -o libteste.so teste.o
+
+https://dbader.org/blog/python-ctypes-tutorial
+https://docs.python.org/3/library/ctypes.html#calling-functions
+https://cai.tools.sap/blog/how-to-speed-up-python-with-c/
+https://realpython.com/pointers-in-python/
+https://stackoverflow.com/questions/32370917/function-that-return-a-pointer-to-a-struct-with-ctypes
+https://stackoverflow.com/questions/7109237/segfault-on-accessing-a-c-initialised-ctypes-structure-element
+https://www.gnu.org/prep/standards/html_node/Writing-C.html
