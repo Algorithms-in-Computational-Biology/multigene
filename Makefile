@@ -8,7 +8,10 @@ BIN = ./bin
 OBJ = ./obj
 STREE = ${LIB}/stree
 FRACT = ${LIB}/fractional
- 
+
+$(shell mkdir -p $(OBJ))
+$(shell mkdir -p $(BIN))
+
 all: multigene.o
 
 multigene.o: dinkelbach.o thermalign.o stree_strmat.o stree_ukkonen.o 
