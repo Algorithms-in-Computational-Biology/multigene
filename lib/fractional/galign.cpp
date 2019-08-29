@@ -544,6 +544,12 @@ void GAlign::OutputLocalAlignment(ostream &outputStream)
     int maxloct;
     // float TempK;
 
+    //------------ Primeira mudanca: pegar a ultima posicao da matriz (m,n) ------------
+    maxloci = seq1len;    
+    maxlocj = seq2len;
+    //printf("i = %d, j = %d\n", maxloci, maxlocj);
+    //----------------------------------------------------------------------------------
+
     float g0, g1, g2;
     g0 = GNNParams->CalcG(dS(maxloci,maxlocj,0),dH(maxloci,maxlocj,0));
     g1 = GNNParams->CalcG(dS(maxloci,maxlocj,1),dH(maxloci,maxlocj,1));
@@ -565,17 +571,18 @@ void GAlign::OutputLocalAlignment(ostream &outputStream)
         maxloct=2;
     }
 
-    bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, true);
+    bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, false);
     s1align<<'\0';
     s2align<<'\0';
     aligntype<<'\0';
+    printf("%d\n", good);
     if (good)
     {
-        //outputStream << s1align.str() << endl << aligntype.str() << endl << s2align.str() << endl << flush;
+        outputStream << s1align.str() << endl << aligntype.str() << endl << s2align.str() << endl << flush;
     }
     else
         outputStream<<"Alignment Error!"<<endl<<flush;
-
+    
     return;
 }
 //#endif
@@ -630,6 +637,7 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
     // check if done
     if ((i<=0) && (j<=0))
     {
+        // printf("i = %d j = %d\n",i ,j);
         return true;  // done!
     }
     // if at border: initial gaps incur no cost! -> done!
@@ -662,32 +670,32 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
             {
                 basePairs[1].i = i - 1;
                 basePairs[1].j = j - 1;
+                //printf("First: %c/%c\n", seq1[i - 1], seq2[j - 1]);
                 first = false;
             }
             else
             {
                 basePairs[0].i = i - 1;
                 basePairs[0].j = j - 1;
+                // printf("Last: %c/%c\n", seq1[i - 1], seq2[j - 1]);
             }
         }
-        h0= dH(i-1,j-1,0)
-            +GNNParams->GetEnthalpy(prevchari,seq1[i-1],prevcharj,seq2[j-1]);
-        h1= dH(i-1,j-1,1)
-            + GNNParams->GetEnthalpy(prevchari,seq1[i-1],'-',seq2[j-1]);
-        h2= dH(i-1,j-1,2)
-            + GNNParams->GetEnthalpy('-',seq1[i-1],prevcharj,seq2[j-1]);
-        s0= dS(i-1,j-1,0)
-            + GNNParams->GetEntropy(prevchari,seq1[i-1],prevcharj,seq2[j-1]);
-        s1= dS(i-1,j-1,1)
-            + GNNParams->GetEntropy(prevchari,seq1[i-1],'-',seq2[j-1]);
-        s2= dS(i-1,j-1,2)
-            + GNNParams->GetEntropy('-',seq1[i-1],prevcharj,seq2[j-1]);
+        h0= dH(i-1,j-1,0) + GNNParams->GetEnthalpy(prevchari, seq1[i-1], prevcharj, seq2[j-1]);
+        h1= dH(i-1,j-1,1) + GNNParams->GetEnthalpy(prevchari,seq1[i-1],'-',seq2[j-1]);
+        h2= dH(i-1,j-1,2) + GNNParams->GetEnthalpy('-',seq1[i-1],prevcharj,seq2[j-1]);
+        s0= dS(i-1,j-1,0) + GNNParams->GetEntropy(prevchari,seq1[i-1],prevcharj,seq2[j-1]);
+        s1= dS(i-1,j-1,1) + GNNParams->GetEntropy(prevchari,seq1[i-1],'-',seq2[j-1]);
+        s2= dS(i-1,j-1,2) + GNNParams->GetEntropy('-',seq1[i-1],prevcharj,seq2[j-1]);
+
         if ((h0==dH(i,j,0))&&(s0==dS(i,j,0)))
             good=OutputAlignment(outputStream,i-1,j-1,0,local);
+            printf("1 - %d\n", good);
         if ((h1==dH(i,j,0))&&(s1==dS(i,j,0))&&(!good))
             good=OutputAlignment(outputStream,i-1,j-1,1,local);
+            printf("2 - %d\n", good);
         if ((h2==dH(i,j,0))&&(s2==dS(i,j,0))&&(!good))
             good=OutputAlignment(outputStream,i-1,j-1,2,local);
+            printf("3 - %d\n", good);
         if (good)
         {
             (*s1aptr)<<seq1[i-1];
@@ -726,18 +734,18 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
     }
     else if (t==1)  // align (i,-)
     {
-        h0= dH(i-1,j,0)
-            + GNNParams->GetEnthalpy(prevchari,seq1[i-1],seq2[j-1],'-');
-        h1= dH(i-1,j,1)
-            + GNNParams->GetEnthalpy(prevchari,seq1[i-1],'-','-');
-        s0= dS(i-1,j,0)
-            + GNNParams->GetEntropy(prevchari,seq1[i-1],seq2[j-1],'-');
-        s1= dS(i-1,j,1)
-            + GNNParams->GetEntropy(prevchari,seq1[i-1],'-','-');
+        h0= dH(i-1,j,0) + GNNParams->GetEnthalpy(prevchari,seq1[i-1],seq2[j-1],'-');
+        h1= dH(i-1,j,1) + GNNParams->GetEnthalpy(prevchari,seq1[i-1],'-','-');
+        s0= dS(i-1,j,0) + GNNParams->GetEntropy(prevchari,seq1[i-1],seq2[j-1],'-');
+        s1= dS(i-1,j,1) + GNNParams->GetEntropy(prevchari,seq1[i-1],'-','-');
+
         if ((h0==dH(i,j,1))&&(s0==dS(i,j,1)))
             good= OutputAlignment(outputStream,i-1,j,0,local);
+            printf("4 - %d\n", good);
         if ((h1==dH(i,j,1))&&(s1==dS(i,j,1))&&(!good))
             good= OutputAlignment(outputStream,i-1,j,1,local);
+            printf("5 - %d\n", good);
+
         if (good)
         {
             (*s1aptr)<<seq1[i-1];
@@ -747,18 +755,17 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
     }
     else if (t==2)
     {
-        h0= dH(i,j-1,0)
-            + GNNParams->GetEnthalpy(seq1[i-1],'-',prevcharj,seq2[j-1]);
-        h2= dH(i,j-1,2)
-            + GNNParams->GetEnthalpy('-','-',prevcharj,seq2[j-1]);
-        s0= dS(i,j-1,0)
-            + GNNParams->GetEntropy(seq1[i-1],'-',prevcharj,seq2[j-1]);
-        s2= dS(i,j-1,2)
-            + GNNParams->GetEntropy('-','-',prevcharj,seq2[j-1]);
+        h0= dH(i,j-1,0) + GNNParams->GetEnthalpy(seq1[i-1],'-',prevcharj,seq2[j-1]);
+        h2= dH(i,j-1,2) + GNNParams->GetEnthalpy('-','-',prevcharj,seq2[j-1]);
+        s0= dS(i,j-1,0) + GNNParams->GetEntropy(seq1[i-1],'-',prevcharj,seq2[j-1]);
+        s2= dS(i,j-1,2) + GNNParams->GetEntropy('-','-',prevcharj,seq2[j-1]);
+
         if ((h0==dH(i,j,2))&&(s0==dS(i,j,2)))
             good = OutputAlignment(outputStream,i,j-1,0,local);
+            printf("6 - %d\n", good);
         if ((h2==dH(i,j,2))&&(s2==dS(i,j,2))&&(!good))
             good = OutputAlignment(outputStream,i,j-1,2,local);
+            printf("7 - %d\n", good);
         if (good)
         {
             (*s1aptr)<<"-";
