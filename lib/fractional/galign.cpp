@@ -545,8 +545,8 @@ void GAlign::OutputLocalAlignment(ostream &outputStream)
     // float TempK;
 
     //------------ Primeira mudanca: pegar a ultima posicao da matriz (m,n) ------------
-    maxloci = seq1len;    
-    maxlocj = seq2len;
+    //maxloci = seq1len;    
+    //maxlocj = seq2len;
     //printf("i = %d, j = %d\n", maxloci, maxlocj);
     //----------------------------------------------------------------------------------
 
@@ -571,11 +571,11 @@ void GAlign::OutputLocalAlignment(ostream &outputStream)
         maxloct=2;
     }
 
-    bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, false);
+    bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, true);
     s1align<<'\0';
     s2align<<'\0';
     aligntype<<'\0';
-    printf("%d\n", good);
+    //printf("%d\n", good);
     if (good)
     {
         outputStream << s1align.str() << endl << aligntype.str() << endl << s2align.str() << endl << flush;
@@ -619,10 +619,10 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
     // have to backtrace through table to find optimum alignment!
     // do this recursively by calling optimum alignment for prefixes of the
     // present alignment...
-#define matchchar "|"
-#define mismatchchar "."
-#define insertchar "."
-#define deletechar "."
+#define matchchar ":"
+#define mismatchchar " "
+#define insertchar " "
+#define deletechar " "
     bool good = false;
     char prevchari = '*';
     char prevcharj = '*';
@@ -689,13 +689,13 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
 
         if ((h0==dH(i,j,0))&&(s0==dS(i,j,0)))
             good=OutputAlignment(outputStream,i-1,j-1,0,local);
-            printf("1 - %d\n", good);
+            //printf("1 - %d\n", good);
         if ((h1==dH(i,j,0))&&(s1==dS(i,j,0))&&(!good))
             good=OutputAlignment(outputStream,i-1,j-1,1,local);
-            printf("2 - %d\n", good);
+            //printf("2 - %d\n", good);
         if ((h2==dH(i,j,0))&&(s2==dS(i,j,0))&&(!good))
             good=OutputAlignment(outputStream,i-1,j-1,2,local);
-            printf("3 - %d\n", good);
+            //printf("3 - %d\n", good);
         if (good)
         {
             (*s1aptr)<<seq1[i-1];
@@ -741,10 +741,10 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
 
         if ((h0==dH(i,j,1))&&(s0==dS(i,j,1)))
             good= OutputAlignment(outputStream,i-1,j,0,local);
-            printf("4 - %d\n", good);
+            //printf("4 - %d\n", good);
         if ((h1==dH(i,j,1))&&(s1==dS(i,j,1))&&(!good))
             good= OutputAlignment(outputStream,i-1,j,1,local);
-            printf("5 - %d\n", good);
+            //printf("5 - %d\n", good);
 
         if (good)
         {
@@ -762,10 +762,10 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool lo
 
         if ((h0==dH(i,j,2))&&(s0==dS(i,j,2)))
             good = OutputAlignment(outputStream,i,j-1,0,local);
-            printf("6 - %d\n", good);
+            //printf("6 - %d\n", good);
         if ((h2==dH(i,j,2))&&(s2==dS(i,j,2))&&(!good))
             good = OutputAlignment(outputStream,i,j-1,2,local);
-            printf("7 - %d\n", good);
+            //printf("7 - %d\n", good);
         if (good)
         {
             (*s1aptr)<<"-";
