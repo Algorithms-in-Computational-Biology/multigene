@@ -333,7 +333,7 @@ public:
 	}
 	inline float GetInitialEntropy() 
 	{
-		return 	-5.9f+rlogc;
+		return 	-5.7f + rlogc;
 	}
 
 	static char getComplement(char,bool=false);

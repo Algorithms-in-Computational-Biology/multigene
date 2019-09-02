@@ -24,6 +24,7 @@
 #include <math.h>
 #include <string.h>
 #include"nnparams.h"
+#include<stdio.h>
 
 #ifdef _pack
 #pragma pack(1)
@@ -90,7 +91,7 @@ void CNNParams::InitParams(float c1, float c2, float kp, int sm)
 		ctFactor = Ct2-Ct1/2;
 	}
 	rlogc = R * log(ctFactor);
-	forbidden_entropy = rlogc;
+        forbidden_entropy = rlogc;
 	kfac = 0.368 * log (kplus);
 	saltMethod = sm;
 	int x,y,a,b;  // variables used as counters...
@@ -185,7 +186,7 @@ void CNNParams::InitParams(float c1, float c2, float kp, int sm)
 			ndS(0,0,x,y) = bloop_entropy;
 		}
 
-    // x-/ya abd xa/y- as well as -x/ay and ax/-y
+        // x-/ya abd xa/y- as well as -x/ay and ax/-y
 	// bulge opening and closing parameters with
 	// adjacent matches / mismatches
 	// obulge_mism and cbulge_mism chosen so high to avoid 
