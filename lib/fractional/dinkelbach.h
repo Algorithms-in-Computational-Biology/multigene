@@ -11,18 +11,15 @@
 
 using namespace std;
 
-//typedef class dinkelbach* DINKEL;
-
-class dinkelbach
-{
+class dinkelbach {
 private:
-    PNNParams myDinkParams;
-    GGAlign myGAlign;
+	PNNParams myDinkParams;
+	GGAlign myGAlign;
 
 public:
-    dinkelbach(PNNParams, GGAlign);
-    ~dinkelbach();
-    int iteration(float);
+	dinkelbach(PNNParams, GGAlign);
+	~dinkelbach();
+	int iteration(float);
 };
 
 #endif /* __dinkelbach_h */

@@ -32,15 +32,13 @@
 #include <stdlib.h>
 
 #ifdef _pack
-  #pragma pack(1)
-  #define dH(a,b,c) (*(dH+((b)*(maxseq1len+1)*3+(a)*3+(c))))
-  #define dS(a,b,c) (*(dS+((b)*(maxseq1len+1)*3+(a)*3+(c))))
+#pragma pack(1)
+#define dH(a,b,c) (*(dH+((b)*(maxseq1len+1)*3+(a)*3+(c))))
+#define dS(a,b,c) (*(dS+((b)*(maxseq1len+1)*3+(a)*3+(c))))
 #else
-  #define dH(a,b,c) (*(dH+((b)*(maxseq1len+1)*3+(a)*3+(c))))
-  #define dS(a,b,c) (*(dS+((b)*(maxseq1len+1)*3+(a)*3+(c))))
+#define dH(a,b,c) (*(dH+((b)*(maxseq1len+1)*3+(a)*3+(c))))
+#define dS(a,b,c) (*(dS+((b)*(maxseq1len+1)*3+(a)*3+(c))))
 #endif
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -54,73 +52,64 @@
 // CThermAlign. Object will be initialized only once, sequences can be
 // passed to it later.
 
-//int s1lmax,s2lmax;  // global requiered for DEBUGGING
-
 CThermAlign::CThermAlign(int ALength, int BLength, PNNParams myNNParams) {
-    // Create dynamic programming matrices for entropy and enthalpy.
-    // The first two dimensions are for the two strings respectively, the
-    // third dimensions differentiates the alignment according to its end:
-    // type 0 Alignments will be those that align x(i+1) with y(j+1),
-    // type 1 Alignments align x(i+1) with a gap
-    // type 2 Alignments align y(i+1) with a gap
-    // All three of these types must separately be considered to select the
-    // optimum alignment in the next iteration.
-    // The alignment algorithm proceeds analogous to the well known
-    // Smith-Waterman algorithm for global alignments.
+	// Create dynamic programming matrices for entropy and enthalpy.
+	// The first two dimensions are for the two strings respectively, the
+	// third dimensions differentiates the alignment according to its end:
+	// type 0 Alignments will be those that align x(i+1) with y(j+1),
+	// type 1 Alignments align x(i+1) with a gap
+	// type 2 Alignments align y(i+1) with a gap
+	// All three of these types must separately be considered to select the
+	// optimum alignment in the next iteration.
+	// The alignment algorithm proceeds analogous to the well known
+	// Smith-Waterman algorithm for global alignments.
 
-    dH = new float[(ALength+1)*(BLength+1)*3];
-    dS = new float[(ALength+1)*(BLength+1)*3];
-//    s1lmax=ALength;
-//    s2lmax=BLength;
+	dH = new float[(ALength + 1) * (BLength + 1) * 3];
+	dS = new float[(ALength + 1) * (BLength + 1) * 3];
 
-	if ((dH==NULL)||(dS==NULL))
-	{
+	if ((dH == NULL) || (dS == NULL)) {
 		printf("Fatal Error: Out of memory!\n");
 		exit(-1);
 	}
-
-    NNParams = myNNParams;
+	NNParams = myNNParams;
 	seq1len = ALength;
 	maxseq1len = seq1len;
 	seq2len = BLength;
 
-    // set dH / dS entries all to zero!
-    #ifdef _pack
-	    // this is FAST, but works only if #pragma pack(1) has been set...
-	    memset(dH,0,(ALength+1)*(BLength+1)*3*sizeof(float));
-	    memset(dS,0,(ALength+1)*(BLength+1)*3*sizeof(float));
-    #else
-		// the following is slower, but works also when padding bytes have 
-		// been inserted in the array for alignment by the compiler...
-		// time is not really critical here, as this initialization is done
-		// only once...
-		for (int a=0;a<=ALength;a++)
-			for (int b=0;b<=BLength;b++)
-			{
-				dH(a,b,0)=0.0f;
-				dH(a,b,1)=0.0f;
-				dH(a,b,2)=0.0f;
-				dS(a,b,0)=0.0f;
-				dS(a,b,1)=0.0f;
-				dS(a,b,2)=0.0f;
-			}
-    #endif
-    InitBorder();  // also need to do only once...
-//    forbidden_entropy = (-(NNParams->R)*(float)log((NNParams->Ct)/4.0f));
-    return;
+	// set dH / dS entries all to zero!
+#ifdef _pack
+	// this is FAST, but works only if #pragma pack(1) has been set...
+	memset(dH,0,(ALength+1)*(BLength+1)*3*sizeof(float));
+	memset(dS,0,(ALength+1)*(BLength+1)*3*sizeof(float));
+#else
+	// the following is slower, but works also when padding bytes have
+	// been inserted in the array for alignment by the compiler...
+	// time is not really critical here, as this initialization is done
+	// only once...
+	for (int a = 0; a <= ALength; a++)
+		for (int b = 0; b <= BLength; b++) {
+			dH(a,b,0) = 0.0f;
+			dH(a,b,1) = 0.0f;
+			dH(a,b,2) = 0.0f;
+			dS(a,b,0) = 0.0f;
+			dS(a,b,1) = 0.0f;
+			dS(a,b,2) = 0.0f;
+		}
+#endif
+	InitBorder();  // also need to do only once...
+
+	return;
 }
 
 //------------------------ Destructor -----------------------------------------
 // Free memory
 
-CThermAlign::~CThermAlign()
-{
+CThermAlign::~CThermAlign() {
 	delete[] dH;
 	delete[] dS;
-    return;
+
+	return;
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   void CThermAlign::InitStrings(char* s1, 
@@ -144,22 +133,15 @@ CThermAlign::~CThermAlign()
 //  $ 01feb07 LK : removed maximum local stuff
 //  #$
 
-void CThermAlign::InitStrings(char* s1,char* s2,int s1len ,int s2len,int minxpos)
-{
-	seq1=s1; seq1len=s1len;
-	seq2=s2; seq2len=s2len;
-	NNParams -> UpdateParams(s1,s2);
-/* lk01feb07: removed maxloc-stuff
-	// if maximum local is not in reused subtable, need to reset!
-	if ((maxlocj>=minxpos)||(maxloci!=seq1len))
-	{
-		maxloci=0; maxlocj=0; maxloctm=0;
-	}
-*/
-//    InitBorder();   //lk01feb07: removed, as it suffices if this is done once in constructor
+void CThermAlign::InitStrings(char *s1, char *s2, int s1len, int s2len) {
+	seq1 = s1;
+	seq1len = s1len;
+	seq2 = s2;
+	seq2len = s2len;
+	NNParams->UpdateParams(s1, s2);
+
 	return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   void CThermAlign::InitBorder();
@@ -180,28 +162,31 @@ void CThermAlign::InitStrings(char* s1,char* s2,int s1len ,int s2len,int minxpos
 //  $ 01feb07 LK : removed local alignment stuff and optimized
 //  #$
 
-void CThermAlign::InitBorder()
-{
+void CThermAlign::InitBorder() {
 	// Initialization for new alignment!
 	maxloctm = 0;   // maximum melting temperature found (kelvin)
-	maxloci  = 0;
-	maxlocj  = 0;
-	maxloct  = 0;
+	maxloci = 0;
+	maxlocj = 0;
+	maxloct = 0;
 
-	for (int i=0; i<=seq1len; i++)
-    {
-		dH(i,0,0) = 0.0f;	dH(i,0,1) = 0.0f;	dH(i,0,2) = 0.0f;
-		dS(i,0,0) = NNParams->GetInitialEntropy();	dS(i,0,1) = NNParams->GetInitialEntropy();	dS(i,0,2) = NNParams->GetInitialEntropy();
-    }
-    for  (int j=1; j<=seq2len; j++)
-    {
-		dH(0,j,0) = 0.0f;	dH(0,j,1) = 0.0f;	dH(0,j,2) = 0.0f;
-		dS(0,j,0) = NNParams->GetInitialEntropy();	dS(0,j,1) = NNParams->GetInitialEntropy();	dS(0,j,2) = NNParams->GetInitialEntropy();
-    }
-
-    return;
+	for (int i = 0; i <= seq1len; i++) {
+		dH(i,0,0) = 0.0f;
+		dH(i,0,1) = 0.0f;
+		dH(i,0,2) = 0.0f;
+		dS(i,0,0) = NNParams->GetInitialEntropy();
+		dS(i,0,1) = NNParams->GetInitialEntropy();
+		dS(i,0,2) = NNParams->GetInitialEntropy();
+	}
+	for (int j = 1; j <= seq2len; j++) {
+		dH(0,j,0) = 0.0f;
+		dH(0,j,1) = 0.0f;
+		dH(0,j,2) = 0.0f;
+		dS(0,j,0) = NNParams->GetInitialEntropy();
+		dS(0,j,1) = NNParams->GetInitialEntropy();
+		dS(0,j,2) = NNParams->GetInitialEntropy();
+	}
+	return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   void CThermAlign::CalculateCell(int i, int j);
@@ -269,9 +254,8 @@ void CThermAlign::InitBorder()
 //                 00dec31 : modified to begin at a specified row!
 //  #$
 
-void CThermAlign::CalculateTable(int startRow)
-{
-//	#define forbidden_enthalpy 1000000000000000000.0f
+void CThermAlign::CalculateTable(int startRow) {
+
 	register int i;
 	register int iminusone;
 	register int j;
@@ -291,115 +275,104 @@ void CThermAlign::CalculateTable(int startRow)
 	register float tm2;
 	register float tm3;
 	float maxtm;
-//    ofstream dboutstream("debug.out");
-//    assert(startRow>0);
-    for (j=startRow; j<=seq2len; j++)
-	{
-		if (j>1)
-			prevcharj = seq2[j-2];
-		else
+
+	for (j = startRow; j <= seq2len; j++) {
+		if (j > 1) {
+			prevcharj = seq2[j - 2];
+		} else {
 			prevcharj = 0;
+		}
 		jminusone = j - 1;
 		seq2char = seq2[jminusone];
-        for (i=1; i<=seq1len; i++)
-        {
-		   // local variables
-			if (i>1)
-				prevchari = seq1[i-2];
-			else
+		for (i = 1; i <= seq1len; i++) {
+			// local variables
+			if (i > 1) {
+				prevchari = seq1[i - 2];
+			} else {
 				prevchari = 0;
+			}
 			iminusone = i - 1;
-			seq1char=seq1[iminusone];
+			seq1char = seq1[iminusone];
 
 			// --------------- Upper cell: Alignment of seq1[i] with seg2[j]
-			entropy1 = dS(iminusone,jminusone,0);
-			enthalpy1 = dH(iminusone,jminusone,0) ;
-			entropy2 = dS(iminusone,jminusone,1);
-			enthalpy2 = dH(iminusone,jminusone,1);
-			entropy3 = dS(iminusone,jminusone,2);
-			enthalpy3 = dH(iminusone,jminusone,2);
-			if (enthalpy1<forbidden_enthalpy)
-			{
-			     entropy1 += NNParams->GetEntropy(prevchari, seq1char, prevcharj, seq2char);
-			     enthalpy1 += NNParams->GetEnthalpy(prevchari, seq1char, prevcharj, seq2char);
+			entropy1 = dS(iminusone, jminusone, 0);
+			enthalpy1 = dH(iminusone, jminusone, 0);
+			entropy2 = dS(iminusone, jminusone, 1);
+			enthalpy2 = dH(iminusone, jminusone, 1);
+			entropy3 = dS(iminusone, jminusone, 2);
+			enthalpy3 = dH(iminusone, jminusone, 2);
+			if (enthalpy1 < forbidden_enthalpy) {
+				entropy1 += NNParams->GetEntropy(prevchari, seq1char, prevcharj, seq2char);
+				enthalpy1 += NNParams->GetEnthalpy(prevchari, seq1char, prevcharj, seq2char);
 			}
-			if (enthalpy2<forbidden_enthalpy)
-			{
-				 enthalpy2 += NNParams->GetEnthalpy(prevchari, seq1char, 0, seq2char); // 0 is gap!
-				 entropy2 += NNParams->GetEntropy(prevchari, seq1char, 0, seq2char);
+			if (enthalpy2 < forbidden_enthalpy) {
+				enthalpy2 += NNParams->GetEnthalpy(prevchari, seq1char, 0, seq2char); // 0 is gap!
+				entropy2 += NNParams->GetEntropy(prevchari, seq1char, 0, seq2char);
 			}
-			if (enthalpy3<forbidden_enthalpy)
-			{
-				 enthalpy3 += NNParams->GetEnthalpy(0, seq1char, prevcharj, seq2char);
-				 entropy3 += NNParams->GetEntropy(0, seq1char, prevcharj, seq2char);
+			if (enthalpy3 < forbidden_enthalpy) {
+				enthalpy3 += NNParams->GetEnthalpy(0, seq1char, prevcharj, seq2char);
+				entropy3 += NNParams->GetEntropy(0, seq1char, prevcharj, seq2char);
 			}
 			// choose optimum combination
 			tm1 = NNParams->CalcTM(entropy1, enthalpy1);
 			tm2 = NNParams->CalcTM(entropy2, enthalpy2);
 			tm3 = NNParams->CalcTM(entropy3, enthalpy3);
-			if ((tm1>=tm2)&&(tm1>=tm3))
-			{
+			if ((tm1 >= tm2) && (tm1 >= tm3)) {
 				dS(i,j,0) = entropy1;
 				dH(i,j,0) = enthalpy1;
-				maxtm=tm1;
-			}
-			else if (tm2>=tm3)
-			{
+				maxtm = tm1;
+			} else if (tm2 >= tm3) {
 				dS(i,j,0) = entropy2;
 				dH(i,j,0) = enthalpy2;
-				maxtm=tm2;
-			}
-			else
-			{
+				maxtm = tm2;
+			} else {
 				dS(i,j,0) = entropy3;
 				dH(i,j,0) = enthalpy3;
-				maxtm=tm3;
+				maxtm = tm3;
 			}
-		    // set to zero if alignment so far is mismatches only (tm will be zero -> no need to reset maxtm)!
-			if (dH(i,j,0)==0)
-			    dS(i,j,0)=NNParams->GetInitialEntropy();
+			// set to zero if alignment so far is mismatches only (tm will be zero -> no need to reset maxtm)!
+			if (dH(i,j,0) == 0) {
+				dS(i,j,0) = NNParams->GetInitialEntropy();
+			}
 			// check if local maximum found!
-			if (((i==seq1len)||(j==seq2len))&&(maxtm>=maxloctm))
-			{
-				maxloctm=maxtm;
-				maxloci=i;
-				maxlocj=j;
-				maxloct=0;
+			if (((i == seq1len) || (j == seq2len)) && (maxtm >= maxloctm)) {
+				maxloctm = maxtm;
+				maxloci = i;
+				maxlocj = j;
+				maxloct = 0;
 			}
-		    // set to zero if alignment so far is mismatches only!
-			if (dH(i,j,0)==0)
-			    dS(i,j,0)=NNParams->GetInitialEntropy();
-
+			// set to zero if alignment so far is mismatches only!
+			if (dH(i,j,0) == 0) {
+				dS(i,j,0) = NNParams->GetInitialEntropy();
+			}
 			// --------------- Middle cell: Alignment of seq1[i] with '-'
 			// following changes lk 01jan08
 			// we do not allow $- in the beginning, therefore set to forbidden if
 			// j=1
-			if (j==1)
-			{
-				enthalpy1=forbidden_enthalpy; enthalpy2=forbidden_enthalpy;
-				entropy1=forbidden_entropy; entropy2=forbidden_entropy;
-			}
-			// also, disallow -$ in the end, therefore forbid if j=seq2len-1
-			else if (j==seq2len-1)
-			{
-				enthalpy1=forbidden_enthalpy; enthalpy2=forbidden_enthalpy;
-				entropy1=forbidden_entropy; entropy2=forbidden_entropy;
-			}
-			else
-			{
+			if (j == 1) {
+				enthalpy1 = forbidden_enthalpy;
+				enthalpy2 = forbidden_enthalpy;
+				entropy1 = forbidden_entropy;
+				entropy2 = forbidden_entropy;
+			} else if (j == seq2len - 1) { // also, disallow -$ in the end, therefore forbid if j=seq2len-1
+				enthalpy1 = forbidden_enthalpy;
+				enthalpy2 = forbidden_enthalpy;
+				entropy1 = forbidden_entropy;
+				entropy2 = forbidden_entropy;
+			} else {
 				// end lk01jan08
 				// -- entropy
-				entropy1 = dS(iminusone,j,0);
-				entropy2 = dS(iminusone,j,1);
-				enthalpy1 = dH(iminusone,j,0);
-				enthalpy2 = dH(iminusone,j,1);
-				if (enthalpy1<forbidden_enthalpy)
-				{
-					entropy1 += NNParams->GetEntropy(prevchari, seq1char, seq2char, 0);
-					enthalpy1 += NNParams->GetEnthalpy(prevchari, seq1char, seq2char, 0);
+				entropy1 = dS(iminusone, j, 0);
+				entropy2 = dS(iminusone, j, 1);
+				enthalpy1 = dH(iminusone, j, 0);
+				enthalpy2 = dH(iminusone, j, 1);
+				if (enthalpy1 < forbidden_enthalpy) {
+					entropy1 += NNParams->GetEntropy(prevchari, seq1char,
+							seq2char, 0);
+					enthalpy1 += NNParams->GetEnthalpy(prevchari, seq1char,
+							seq2char, 0);
 				}
-				if (enthalpy2<forbidden_enthalpy)
-				{
+				if (enthalpy2 < forbidden_enthalpy) {
 					entropy2 += NNParams->GetEntropy(prevchari, seq1char, 0, 0);
 					enthalpy2 += NNParams->GetEnthalpy(prevchari, seq1char, 0, 0);
 				}
@@ -407,102 +380,85 @@ void CThermAlign::CalculateTable(int startRow)
 			// -- choose optimum combination
 			tm1 = NNParams->CalcTM(entropy1, enthalpy1);
 			tm2 = NNParams->CalcTM(entropy2, enthalpy2);
-			if (tm1>=tm2)
-			{
-				dS(i,j,1)=entropy1;
-				dH(i,j,1)=enthalpy1;
-				maxtm=tm1;
-			}
-			else
-			{
-				dS(i,j,1)=entropy2;
-				dH(i,j,1)=enthalpy2;
-				maxtm=tm2;
+			if (tm1 >= tm2) {
+				dS(i,j,1) = entropy1;
+				dH(i,j,1) = enthalpy1;
+				maxtm = tm1;
+			} else {
+				dS(i,j,1) = entropy2;
+				dH(i,j,1) = enthalpy2;
+				maxtm = tm2;
 			}
 			// check if local maximum found!
-			if (((i==seq1len)||(j==seq2len))&&(maxtm>=maxloctm))
-			{
-				maxloctm=maxtm;
-				maxloci=i;
-				maxlocj=j;
-				maxloct=1;
+			if (((i == seq1len) || (j == seq2len)) && (maxtm >= maxloctm)) {
+				maxloctm = maxtm;
+				maxloci = i;
+				maxlocj = j;
+				maxloct = 1;
 			}
-		    // set to zero if alignment so far is mismatches only!
-			if (dH(i,j,1)==0)
-			    dS(i,j,1)=NNParams->GetInitialEntropy();
-		
+			// set to zero if alignment so far is mismatches only!
+			if (dH(i,j,1) == 0) {
+				dS(i,j,1) = NNParams->GetInitialEntropy();
+			}
 			// --------------- Lower cell: Alignment of '-' with seq2[j]
 			// following changes lk 01jan08
 			// we do not allow $- in the beginning, therefore set to forbidden if
 			// i=1
-			if (i==1)
-			{
-				enthalpy1=forbidden_enthalpy; enthalpy2=forbidden_enthalpy;
-				entropy1=forbidden_entropy; entropy2=forbidden_entropy;
-			}
-			// also, disallow -$ in the end, therefore forbid if i=seq1len-1
-			else if (i==seq1len-1)
-			{
-				enthalpy1=forbidden_enthalpy; enthalpy2=forbidden_enthalpy;
-				entropy1=forbidden_entropy; entropy2=forbidden_entropy;
-			}
-			else
-			{
-			// end lk01jan08
-				entropy1 = dS(i,jminusone,0);
-				entropy2 = dS(i,jminusone,2);
-				enthalpy1 = dH(i,jminusone,0);
-				enthalpy2 = dH(i,jminusone,2);
-				if (enthalpy1<forbidden_enthalpy)
-				{
-					entropy1 += NNParams->GetEntropy(seq1char, 0, prevcharj, seq2char);
-					enthalpy1 += NNParams->GetEnthalpy(seq1char, 0, prevcharj, seq2char);
+			if (i == 1) {
+				enthalpy1 = forbidden_enthalpy;
+				enthalpy2 = forbidden_enthalpy;
+				entropy1 = forbidden_entropy;
+				entropy2 = forbidden_entropy;
+			} else if (i == seq1len - 1) { // also, disallow -$ in the end, therefore forbid if i = seq1len - 1
+				enthalpy1 = forbidden_enthalpy;
+				enthalpy2 = forbidden_enthalpy;
+				entropy1 = forbidden_entropy;
+				entropy2 = forbidden_entropy;
+			} else {
+				// end lk01jan08
+				entropy1 = dS(i, jminusone, 0);
+				entropy2 = dS(i, jminusone, 2);
+				enthalpy1 = dH(i, jminusone, 0);
+				enthalpy2 = dH(i, jminusone, 2);
+				if (enthalpy1 < forbidden_enthalpy) {
+					entropy1 += NNParams->GetEntropy(seq1char, 0, prevcharj,
+							seq2char);
+					enthalpy1 += NNParams->GetEnthalpy(seq1char, 0, prevcharj,
+							seq2char);
 				}
-				if (enthalpy2<forbidden_enthalpy)
-				{
+				if (enthalpy2 < forbidden_enthalpy) {
 					entropy2 += NNParams->GetEntropy(0, 0, prevcharj, seq2char);
-					enthalpy2 += NNParams->GetEnthalpy(0, 0, prevcharj, seq2char);
+					enthalpy2 += NNParams->GetEnthalpy(0, 0, prevcharj,
+							seq2char);
 				}
 			}
 			// -- choose optimum combination
 			tm1 = NNParams->CalcTM(entropy1, enthalpy1);
 			tm2 = NNParams->CalcTM(entropy2, enthalpy2);
-			if (tm1>=tm2)
-			{
-				dS(i,j,2)=entropy1;
-				dH(i,j,2)=enthalpy1;
-				maxtm=tm1;
-			}
-			else
-			{
-				dS(i,j,2)=entropy2;
-				dH(i,j,2)=enthalpy2;
-				maxtm=tm2;
+			if (tm1 >= tm2) {
+				dS(i,j,2) = entropy1;
+				dH(i,j,2) = enthalpy1;
+				maxtm = tm1;
+			} else {
+				dS(i,j,2) = entropy2;
+				dH(i,j,2) = enthalpy2;
+				maxtm = tm2;
 			}
 			// check if local maximum found!
-			if (((i==seq1len)||(j==seq2len))&&(maxtm>=maxloctm))
-			{
-				maxloctm=maxtm;
-				maxloci=i;
-				maxlocj=j;
-				maxloct=2;
+			if (((i == seq1len) || (j == seq2len)) && (maxtm >= maxloctm)) {
+				maxloctm = maxtm;
+				maxloci = i;
+				maxlocj = j;
+				maxloct = 2;
 			}
-		    // set to zero if alignment so far is mismatches only!
-			if (dH(i,j,2)==0)
-			    dS(i,j,2)=NNParams->GetInitialEntropy();
-			
-		
-		/*
-            dboutstream<<"After cell ("<<i<<","<<j<<"):"<<endl;
-            PrintDPTable(dboutstream);
-            dboutstream<<endl<<flush;
-		*/
-        }
+			// set to zero if alignment so far is mismatches only!
+			if (dH(i,j,2) == 0) {
+				dS(i,j,2) = NNParams->GetInitialEntropy();
+			}
+		}
 	}
-    return;
+	return;
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   void CThermAlign::printAlignment(ostream&);
@@ -520,14 +476,13 @@ void CThermAlign::CalculateTable(int startRow)
 //  #$
 //#ifdef _output_alignment
 
-void CThermAlign::printAlignment(ostream &outputStream)
-{
-	outputStream<<"~~~~~~~~~~~~~~"<<endl<<"Best global Alignment..."<<endl;
+void CThermAlign::printAlignment(ostream &outputStream) {
+	outputStream << "~~~~~~~~~~~~~~" << endl << "Best global Alignment..."
+			<< endl;
 	OutputAlignment(outputStream);
 	OutputLocalAlignment(outputStream);
 }
 //#endif
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   void CThermAlign::OutputAlignment(ostream &outputStream);
@@ -548,8 +503,7 @@ void CThermAlign::printAlignment(ostream &outputStream)
 
 //#ifdef _output_alignment
 
-void CThermAlign::OutputAlignment(ostream &outputStream)
-{
+void CThermAlign::OutputAlignment(ostream &outputStream) {
 	s1align.freeze(0);
 	s2align.freeze(0);
 	aligntype.freeze(0);
@@ -557,45 +511,44 @@ void CThermAlign::OutputAlignment(ostream &outputStream)
 	s2align.seekp(0);
 	aligntype.seekp(0);
 
-    // have to backtrace through table to find optimum alignment!
-    // do this recursively by calling optimum alignment for prefixes of the
-    // present alignment...
+	// have to backtrace through table to find optimum alignment!
+	// do this recursively by calling optimum alignment for prefixes of the
+	// present alignment...
 	// Calculate Melting temperature for optimum alignment!
-	float tm0 = NNParams->CalcTM(dS(seq1len,seq2len,0),dH(seq1len,seq2len,0));
-	float tm1 = NNParams->CalcTM(dS(seq1len,seq2len,1),dH(seq1len,seq2len,1));
-	float tm2 = NNParams->CalcTM(dS(seq1len,seq2len,2),dH(seq1len,seq2len,2));
+	float tm0 = NNParams->CalcTM(dS(seq1len, seq2len, 0),
+			dH(seq1len, seq2len, 0));
+	float tm1 = NNParams->CalcTM(dS(seq1len, seq2len, 1),
+			dH(seq1len, seq2len, 1));
+	float tm2 = NNParams->CalcTM(dS(seq1len, seq2len, 2),
+			dH(seq1len, seq2len, 2));
 	bool good = false;
 	s1aptr = &s1align;
 	s2aptr = &s2align;
 	atypptr = &aligntype;
-	if ((tm0>=tm1)&&(tm0>=tm2))
-	{
-		outputStream<<"TM = "<<tm0<<endl;
-	    good = OutputAlignment(outputStream,seq1len, seq2len, 0);
+	if ((tm0 >= tm1) && (tm0 >= tm2)) {
+		outputStream << "TM = " << tm0 << endl;
+		good = OutputAlignment(outputStream, seq1len, seq2len, 0);
 	}
-	if ((tm1>=tm0)&&(tm1>=tm2)&&(!good))
-	{
-		outputStream<<"TM = "<<tm1<<endl;
-	    good = OutputAlignment(outputStream,seq1len, seq2len, 1);
+	if ((tm1 >= tm0) && (tm1 >= tm2) && (!good)) {
+		outputStream << "TM = " << tm1 << endl;
+		good = OutputAlignment(outputStream, seq1len, seq2len, 1);
 	}
-	if ((tm2>=tm0)&&(tm2>=tm1)&&(!good))
-	{
-		outputStream<<"TM = "<<tm2<<endl;
-	    good = OutputAlignment(outputStream,seq1len, seq2len, 2);
+	if ((tm2 >= tm0) && (tm2 >= tm1) && (!good)) {
+		outputStream << "TM = " << tm2 << endl;
+		good = OutputAlignment(outputStream, seq1len, seq2len, 2);
 	}
-	s1align<<'\0';
-	s2align<<'\0';
-	aligntype<<'\0';
+	s1align << '\0';
+	s2align << '\0';
+	aligntype << '\0';
 	if (good)
-		outputStream<<"Alignment:"<<endl<<s1align.str()<<endl<<s2align.str()<<endl
-		    <<aligntype.str()<<endl<<flush;
+		outputStream << "Alignment:" << endl << s1align.str() << endl
+				<< s2align.str() << endl << aligntype.str() << endl << flush;
 	else
-		outputStream<<"Alignment Error!"<<endl<<flush;
+		outputStream << "Alignment Error!" << endl << flush;
 
-    return; 
+	return;
 }
 //#endif
-
 
 //#ifdef _output_alignment
 ///////////////////////////////////////////////////////////////////////////////
@@ -615,8 +568,7 @@ void CThermAlign::OutputAlignment(ostream &outputStream)
 //  $              00nov16 : changed to print to outputStream
 //  #$
 
-void CThermAlign::OutputLocalAlignment(ostream &outputStream)
-{
+void CThermAlign::OutputLocalAlignment(ostream &outputStream) {
 	s1align.freeze(0);
 	s2align.freeze(0);
 	aligntype.freeze(0);
@@ -624,49 +576,35 @@ void CThermAlign::OutputLocalAlignment(ostream &outputStream)
 	s2align.seekp(0);
 	aligntype.seekp(0);
 
-	/*outputStream<<"Maximum Local Alignment: " << maxloctm-273.15
-		    <<" ("<<maxloci<<","<<maxlocj<<")"
-		    <<endl;*/
-	s1aptr=&s1align;
-	s2aptr=&s2align;
-	atypptr=&aligntype;
+	s1aptr = &s1align;
+	s2aptr = &s2align;
+	atypptr = &aligntype;
 	int maxloct;
 
 	float tm0, tm1, tm2;
-	tm0 = NNParams->CalcTM(dS(maxloci,maxlocj,0),dH(maxloci,maxlocj,0));
-	tm1 = NNParams->CalcTM(dS(maxloci,maxlocj,1),dH(maxloci,maxlocj,1));
-	tm2 = NNParams->CalcTM(dS(maxloci,maxlocj,2),dH(maxloci,maxlocj,2));
-	if ((tm0>=tm1)&&(tm0>=tm2))
-	{
-   	    //outputStream<<"TM = "<<tm0-273.15<<endl;
-		maxloct=0;
+	tm0 = NNParams->CalcTM(dS(maxloci, maxlocj, 0), dH(maxloci, maxlocj, 0));
+	tm1 = NNParams->CalcTM(dS(maxloci, maxlocj, 1), dH(maxloci, maxlocj, 1));
+	tm2 = NNParams->CalcTM(dS(maxloci, maxlocj, 2), dH(maxloci, maxlocj, 2));
+	if ((tm0 >= tm1) && (tm0 >= tm2)) {
+		maxloct = 0;
+	} else if ((tm1 >= tm0) && (tm1 >= tm2)) {
+		maxloct = 1;
+	} else {
+		maxloct = 2;
 	}
-	else if ((tm1>=tm0)&&(tm1>=tm2))
-	{
-   	    //outputStream<<"TM = "<<tm1-273.15<<endl;
-		maxloct=1;
-	}
-	else
-	{
-   	    //outputStream<<"TM = "<<tm2-273.15<<endl;
-		maxloct=2;
-	}
-
 	bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, true);
-	s1align<<'\0';
-	s2align<<'\0';
-	aligntype<<'\0';
-	if (good)
-        {
-		outputStream<<s1align.str()<<endl<<s2align.str()<<endl <<aligntype.str()<<endl<<flush;
-        }
-	else
-		outputStream<<"Alignment Error!"<<endl<<flush;
+	s1align << '\0';
+	s2align << '\0';
+	aligntype << '\0';
+	if (good) {
+		outputStream << s1align.str() << endl << s2align.str() << endl
+				<< aligntype.str() << endl << flush;
+	} else
+		outputStream << "Alignment Error!" << endl << flush;
 
-    return;
+	return;
 }
 //#endif
-
 
 //#ifdef _output_alignment
 ///////////////////////////////////////////////////////////////////////////////
@@ -695,166 +633,173 @@ void CThermAlign::OutputLocalAlignment(ostream &outputStream)
 //  $              00nov16 : changed to output to file
 //  #$
 
-bool CThermAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bool local)
-{
-    // have to backtrace through table to find optimum alignment!
-    // do this recursively by calling optimum alignment for prefixes of the
-    // present alignment...
-    #define matchchar "M"
-    #define mismatchchar "."
-    #define insertchar "."
-    #define deletechar "."
+bool CThermAlign::OutputAlignment(ostream &outputStream, int i, int j, int t,
+		bool local) {
+	// have to backtrace through table to find optimum alignment!
+	// do this recursively by calling optimum alignment for prefixes of the
+	// present alignment...
+#define matchchar "M"
+#define mismatchchar "."
+#define insertchar "."
+#define deletechar "."
 	bool good = false;
-    char prevchari = '*';
-    char prevcharj = '*';
-    if (i>1) {
-        prevchari = seq1[i-2];
-    }
-    if (j>1) {
-        prevcharj = seq2[j-2];
-    }
+	char prevchari = '*';
+	char prevcharj = '*';
+	if (i > 1) {
+		prevchari = seq1[i - 2];
+	}
+	if (j > 1) {
+		prevcharj = seq2[j - 2];
+	}
 	// check if done
-	if ((i<=0) && (j<=0)) {
+	if ((i <= 0) && (j <= 0)) {
 		return true;  // done!
-        }
+	}
 	// if at border: initial gaps incur no cost! -> done!
-	if (i==0)
-	{
-	    if (local==false)
-		    OutputAlignment(outputStream,i,j-1,2);
-		(*s1aptr)<<"-";
-		(*s2aptr)<<seq2[j-1];
-		(*atypptr)<<deletechar;
+	if (i == 0) {
+		if (local == false) {
+			OutputAlignment(outputStream, i, j - 1, 2);
+		}
+		(*s1aptr) << "-";
+		(*s2aptr) << seq2[j - 1];
+		(*atypptr) << deletechar;
+
 		return true;
 	}
-	if (j==0)
-	{
-	    if (local==false)
-		  OutputAlignment(outputStream,i-1,j,1);
-		(*s1aptr)<<seq1[i-1];
-		(*s2aptr)<<"-";
-		(*atypptr)<<insertchar;
+	if (j == 0) {
+		if (local == false) {
+			OutputAlignment(outputStream, i - 1, j, 1);
+		}
+		(*s1aptr) << seq1[i - 1];
+		(*s2aptr) << "-";
+		(*atypptr) << insertchar;
+
 		return true;
 	}
 
 	// which type is the best alignment?
 	float h0, h1, h2, s0, s1, s2;
-	if (t==0)   // align (i,j). What was previous alignment?
-	{
-		h0= dH(i-1,j-1,0)
-			+ NNParams->GetEnthalpy(prevchari,seq1[i-1],prevcharj,seq2[j-1]);
-		h1= dH(i-1,j-1,1)
-			+ NNParams->GetEnthalpy(prevchari,seq1[i-1],'-',seq2[j-1]);
-		h2= dH(i-1,j-1,2)
-			+ NNParams->GetEnthalpy('-',seq1[i-1],prevcharj,seq2[j-1]);
-		s0= dS(i-1,j-1,0)
-			+ NNParams->GetEntropy(prevchari,seq1[i-1],prevcharj,seq2[j-1]);
-		s1= dS(i-1,j-1,1)
-			+ NNParams->GetEntropy(prevchari,seq1[i-1],'-',seq2[j-1]);
-		s2= dS(i-1,j-1,2)
-			+ NNParams->GetEntropy('-',seq1[i-1],prevcharj,seq2[j-1]);
-		if ((h0==dH(i,j,0))&&(s0==dS(i,j,0)))
-			good=OutputAlignment(outputStream,i-1,j-1,0,local);
-		if ((h1==dH(i,j,0))&&(s1==dS(i,j,0))&&(!good))
-			good=OutputAlignment(outputStream,i-1,j-1,1,local);
-		if ((h2==dH(i,j,0))&&(s2==dS(i,j,0))&&(!good))
-			good=OutputAlignment(outputStream,i-1,j-1,2,local);
-		if (good)
-		{
-			(*s1aptr)<<seq1[i-1];
-			(*s2aptr)<<seq2[j-1];
-			if (seq1[i-1]=='A')
-			{
-				if (seq2[j-1]=='T')
-					(*atypptr)<<matchchar;
-				else
-					(*atypptr)<<mismatchchar;
+	if (t == 0) {   // align (i,j). What was previous alignment?
+		h0 = dH(i - 1, j - 1, 0)
+				+ NNParams->GetEnthalpy(prevchari, seq1[i - 1], prevcharj,
+						seq2[j - 1]);
+		h1 = dH(i - 1, j - 1, 1)
+				+ NNParams->GetEnthalpy(prevchari, seq1[i - 1], '-',
+						seq2[j - 1]);
+		h2 = dH(i - 1, j - 1, 2)
+				+ NNParams->GetEnthalpy('-', seq1[i - 1], prevcharj,
+						seq2[j - 1]);
+		s0 = dS(i - 1, j - 1, 0)
+				+ NNParams->GetEntropy(prevchari, seq1[i - 1], prevcharj,
+						seq2[j - 1]);
+		s1 = dS(i - 1, j - 1, 1)
+				+ NNParams->GetEntropy(prevchari, seq1[i - 1], '-',
+						seq2[j - 1]);
+		s2 = dS(i - 1, j - 1, 2)
+				+ NNParams->GetEntropy('-', seq1[i - 1], prevcharj,
+						seq2[j - 1]);
+		if ((h0 == dH(i, j, 0)) && (s0 == dS(i, j, 0))) {
+			good = OutputAlignment(outputStream, i - 1, j - 1, 0, local);
+		}
+		if ((h1 == dH(i, j, 0)) && (s1 == dS(i, j, 0)) && (!good)) {
+			good = OutputAlignment(outputStream, i - 1, j - 1, 1, local);
+		}
+		if ((h2 == dH(i, j, 0)) && (s2 == dS(i, j, 0)) && (!good)) {
+			good = OutputAlignment(outputStream, i - 1, j - 1, 2, local);
+		}
+		if (good) {
+			(*s1aptr) << seq1[i - 1];
+			(*s2aptr) << seq2[j - 1];
+			if (seq1[i - 1] == 'A') {
+				if (seq2[j - 1] == 'T') {
+					(*atypptr) << matchchar;
+				} else {
+					(*atypptr) << mismatchchar;
+				}
 			}
-			if (seq1[i-1]=='C')
-			{
-				if (seq2[j-1]=='G')
-					(*atypptr)<<matchchar;
-				else
-					(*atypptr)<<mismatchchar;
+			if (seq1[i - 1] == 'C') {
+				if (seq2[j - 1] == 'G') {
+					(*atypptr) << matchchar;
+				} else {
+					(*atypptr) << mismatchchar;
+				}
 			}
-			if (seq1[i-1]=='G')
-			{
-				if (seq2[j-1]=='C')
-					(*atypptr)<<matchchar;
-				else
-					(*atypptr)<<mismatchchar;
+			if (seq1[i - 1] == 'G') {
+				if (seq2[j - 1] == 'C') {
+					(*atypptr) << matchchar;
+				} else {
+					(*atypptr) << mismatchchar;
+				}
 			}
-			if (seq1[i-1]=='T')
-			{
-				if (seq2[j-1]=='A')
-					(*atypptr)<<matchchar;
-				else
-					(*atypptr)<<mismatchchar;
+			if (seq1[i - 1] == 'T') {
+				if (seq2[j - 1] == 'A') {
+					(*atypptr) << matchchar;
+				} else {
+					(*atypptr) << mismatchchar;
+				}
 			}
-			if (seq1[i-1]=='$')
-				(*atypptr)<<mismatchchar;
+			if (seq1[i - 1] == '$') {
+				(*atypptr) << mismatchchar;
+			}
+		}
+	} else if (t == 1) {  // align (i,-)
+		h0 = dH(i - 1, j, 0)
+				+ NNParams->GetEnthalpy(prevchari, seq1[i - 1], seq2[j - 1],
+						'-');
+		h1 = dH(i - 1, j, 1)
+				+ NNParams->GetEnthalpy(prevchari, seq1[i - 1], '-', '-');
+		s0 = dS(i - 1, j, 0)
+				+ NNParams->GetEntropy(prevchari, seq1[i - 1], seq2[j - 1],
+						'-');
+		s1 = dS(i - 1, j, 1)
+				+ NNParams->GetEntropy(prevchari, seq1[i - 1], '-', '-');
+		if ((h0 == dH(i, j, 1)) && (s0 == dS(i, j, 1))) {
+			good = OutputAlignment(outputStream, i - 1, j, 0, local);
+		}
+		if ((h1 == dH(i, j, 1)) && (s1 == dS(i, j, 1)) && (!good)) {
+			good = OutputAlignment(outputStream, i - 1, j, 1, local);
+		}
+		if (good) {
+			(*s1aptr) << seq1[i - 1];
+			(*s2aptr) << "-";
+			(*atypptr) << insertchar;
+		}
+	} else if (t == 2) {
+		h0 = dH(i, j - 1, 0)
+				+ NNParams->GetEnthalpy(seq1[i - 1], '-', prevcharj,
+						seq2[j - 1]);
+		h2 = dH(i, j - 1, 2)
+				+ NNParams->GetEnthalpy('-', '-', prevcharj, seq2[j - 1]);
+		s0 = dS(i, j - 1, 0)
+				+ NNParams->GetEntropy(seq1[i - 1], '-', prevcharj,
+						seq2[j - 1]);
+		s2 = dS(i, j - 1, 2)
+				+ NNParams->GetEntropy('-', '-', prevcharj, seq2[j - 1]);
+		if ((h0 == dH(i, j, 2)) && (s0 == dS(i, j, 2))) {
+			good = OutputAlignment(outputStream, i, j - 1, 0, local);
+		}
+		if ((h2 == dH(i, j, 2)) && (s2 == dS(i, j, 2)) && (!good)) {
+			good = OutputAlignment(outputStream, i, j - 1, 2, local);
+		}
+		if (good) {
+			(*s1aptr) << "-";
+			(*s2aptr) << seq2[j - 1];
+			(*atypptr) << deletechar;
 		}
 	}
-	else if (t==1)  // align (i,-)
-	{
-		h0= dH(i-1,j,0)
-			+ NNParams->GetEnthalpy(prevchari,seq1[i-1],seq2[j-1],'-');
-		h1= dH(i-1,j,1)
-			+ NNParams->GetEnthalpy(prevchari,seq1[i-1],'-','-');
-		s0= dS(i-1,j,0)
-			+ NNParams->GetEntropy(prevchari,seq1[i-1],seq2[j-1],'-');
-		s1= dS(i-1,j,1)
-			+ NNParams->GetEntropy(prevchari,seq1[i-1],'-','-');
-		if ((h0==dH(i,j,1))&&(s0==dS(i,j,1)))
-			good= OutputAlignment(outputStream,i-1,j,0,local);
-		if ((h1==dH(i,j,1))&&(s1==dS(i,j,1))&&(!good))
-			good= OutputAlignment(outputStream,i-1,j,1,local);
-        if (good)
-		{
-			(*s1aptr)<<seq1[i-1];
-			(*s2aptr)<<"-";
-			(*atypptr)<<insertchar;
-		}
-	}
-	else if (t==2)
-	{
-		h0= dH(i,j-1,0)
-			+ NNParams->GetEnthalpy(seq1[i-1],'-',prevcharj,seq2[j-1]);
-		h2= dH(i,j-1,2)
-			+ NNParams->GetEnthalpy('-','-',prevcharj,seq2[j-1]);
-		s0= dS(i,j-1,0)
-			+ NNParams->GetEntropy(seq1[i-1],'-',prevcharj,seq2[j-1]);
-		s2= dS(i,j-1,2)
-			+ NNParams->GetEntropy('-','-',prevcharj,seq2[j-1]);
-		if ((h0==dH(i,j,2))&&(s0==dS(i,j,2)))
-			good = OutputAlignment(outputStream,i,j-1,0,local);
-		if ((h2==dH(i,j,2))&&(s2==dS(i,j,2))&&(!good))
-			good = OutputAlignment(outputStream,i,j-1,2,local);
-		if (good)
-		{
-			(*s1aptr)<<"-";
-			(*s2aptr)<<seq2[j-1];
-			(*atypptr)<<deletechar;
-		}
-	}
-	if (local)
-	{
-	    if (!good)
-	    {
-		    if ((i>0)&&(j>0))
-			{
-			    (*s1aptr)<<seq1[i-1];
-				(*s2aptr)<<seq2[j-1];
-				(*atypptr)<<",";
+	if (local) {
+		if (!good) {
+			if ((i > 0) && (j > 0)) {
+				(*s1aptr) << seq1[i - 1];
+				(*s2aptr) << seq2[j - 1];
+				(*atypptr) << ",";
 			}
-	    }
+		}
 		return true;
-	}
-	else
-	  return good;
+	} else
+		return good;
 }
 //#endif
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   float GetEntropy(int i, int j);
@@ -871,25 +816,23 @@ bool CThermAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bo
 //  $              00sep23 : created LK
 //  #$
 
-/* inline */ float CThermAlign::GetEntropy(int i, int j)
-{
+/* inline */float CThermAlign::GetEntropy(int i, int j) {
 	float entropy;
 
 	// first, need to determine optimum values for dG and dH
 	float tm0, tm1, tm2;
-	tm0 = NNParams->CalcTM(dS(i,j,0),dH(i,j,0));
-	tm1 = NNParams->CalcTM(dS(i,j,1),dH(i,j,1));
-	tm2 = NNParams->CalcTM(dS(i,j,2),dH(i,j,2));
-	if ((tm0>=tm1)&&(tm0>=tm2))
-		entropy = dS(i,j,0);
-	else if ((tm1>=tm0)&&(tm1>=tm2))
-		entropy = dS(i,j,1);
-	else
-		entropy = dS(i,j,2);
-
+	tm0 = NNParams->CalcTM(dS(i, j, 0), dH(i, j, 0));
+	tm1 = NNParams->CalcTM(dS(i, j, 1), dH(i, j, 1));
+	tm2 = NNParams->CalcTM(dS(i, j, 2), dH(i, j, 2));
+	if ((tm0 >= tm1) && (tm0 >= tm2)) {
+		entropy = dS(i, j, 0);
+	} else if ((tm1 >= tm0) && (tm1 >= tm2)) {
+		entropy = dS(i, j, 1);
+	} else {
+		entropy = dS(i, j, 2);
+	}
 	return entropy;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   float GetEnthalpy(int i, int j);
@@ -906,22 +849,21 @@ bool CThermAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bo
 //  $              00sep23 : created LK
 //  #$
 
-/* inline */ float CThermAlign::GetEnthalpy(int i, int j)
-{
+/* inline */float CThermAlign::GetEnthalpy(int i, int j) {
 	float enthalpy;
 
 	// first, need to determine optimum values for dG and dH
 	float tm0, tm1, tm2;
-	tm0 = NNParams->CalcTM(dS(i,j,0),dH(i,j,0));
-	tm1 = NNParams->CalcTM(dS(i,j,1),dH(i,j,1));
-	tm2 = NNParams->CalcTM(dS(i,j,2),dH(i,j,2));
-	if ((tm0>=tm1)&&(tm0>=tm2))
-		enthalpy = dH(i,j,0);
-	else if ((tm1>=tm0)&&(tm1>=tm2))
-		enthalpy = dH(i,j,1);
-	else
-		enthalpy = dH(i,j,2);
-
+	tm0 = NNParams->CalcTM(dS(i, j, 0), dH(i, j, 0));
+	tm1 = NNParams->CalcTM(dS(i, j, 1), dH(i, j, 1));
+	tm2 = NNParams->CalcTM(dS(i, j, 2), dH(i, j, 2));
+	if ((tm0 >= tm1) && (tm0 >= tm2)) {
+		enthalpy = dH(i, j, 0);
+	} else if ((tm1 >= tm0) && (tm1 >= tm2)) {
+		enthalpy = dH(i, j, 1);
+	} else {
+		enthalpy = dH(i, j, 2);
+	}
 	return enthalpy;
 }
 
@@ -940,11 +882,9 @@ bool CThermAlign::OutputAlignment(ostream &outputStream, int i, int j, int t, bo
 //  $              00sep06 : created LK
 //  #$
 
-float CThermAlign::GetFreeEnergy(int i, int j)
-{
-	return GetFreeEnergyK(i,j,GetMeltingTempK(i,j));
+float CThermAlign::GetFreeEnergy(int i, int j) {
+	return GetFreeEnergyK(i, j, GetMeltingTempK(i, j));
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   float GetFreeEnergyK(int i, int j, float t);
@@ -962,20 +902,14 @@ float CThermAlign::GetFreeEnergy(int i, int j)
 //  $              00sep06 : created LK
 //  #$
 
-float CThermAlign::GetFreeEnergyK(int i, int j, float t)
-{
+float CThermAlign::GetFreeEnergyK(int i, int j, float t) {
 	// dG = dH - T * dS 
-
-	float entropy;
-	float enthalpy;
-
 	// first, need to determine optimum values for dG and dH
-	entropy = GetEntropy(i,j);
-	enthalpy = GetEnthalpy(i,j);
+	float entropy = GetEntropy(i, j);
+	float enthalpy = GetEnthalpy(i, j);
 
 	return enthalpy - t * entropy;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   float GetFreeEnergyC(int i, int j, int t);
@@ -993,16 +927,11 @@ float CThermAlign::GetFreeEnergyK(int i, int j, float t)
 //  $              00sep06 : created LK
 //  #$
 
-float CThermAlign::GetFreeEnergyC(int i, int j, float t)
-{
+float CThermAlign::GetFreeEnergyC(int i, int j, float t) {
 	// dG = dH - T * dS
-
-	float entropy;
-	float enthalpy;
-
 	// first, need to determine optimum values for dG and dH
-	entropy = GetEntropy(i,j);
-	enthalpy = GetEnthalpy(i,j);
+	float entropy = GetEntropy(i, j);
+	float enthalpy = GetEnthalpy(i, j);
 
 	return enthalpy - (t + 273.15f) * entropy;
 }
@@ -1022,11 +951,9 @@ float CThermAlign::GetFreeEnergyC(int i, int j, float t)
 //  $              00sep06 : created LK
 //  #$
 
-float CThermAlign::GetMeltingTempC(int i, int j)
-{
-	return GetMeltingTempK(i,j) - 273.15f;
+float CThermAlign::GetMeltingTempC(int i, int j) {
+	return GetMeltingTempK(i, j) - 273.15f;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //  FUNCTION:   float CThermAlign::GetMeltingTempK(int i, int j)
@@ -1043,24 +970,24 @@ float CThermAlign::GetMeltingTempC(int i, int j)
 //  $              00sep06 : created LK
 //  #$
 
-float CThermAlign::GetMeltingTempK(int i, int j)
-{
+float CThermAlign::GetMeltingTempK(int i, int j) {
 	float tm0, tm1, tm2;
-	tm0 = NNParams->CalcTM(dS(i,j,0),dH(i,j,0));
-	tm1 = NNParams->CalcTM(dS(i,j,1),dH(i,j,1));
-	tm2 = NNParams->CalcTM(dS(i,j,2),dH(i,j,2));
+	tm0 = NNParams->CalcTM(dS(i, j, 0), dH(i, j, 0));
+	tm1 = NNParams->CalcTM(dS(i, j, 1), dH(i, j, 1));
+	tm2 = NNParams->CalcTM(dS(i, j, 2), dH(i, j, 2));
 	float maxtm;
-	if ((tm0>=tm1)&&(tm0>=tm2))
-		maxtm=tm0;
-	else if ((tm1>=tm0)&&(tm1>=tm2))
-		maxtm=tm1;
-	else
-		maxtm=tm2;
-	if (maxtm<0)
-		maxtm=0;
+	if ((tm0 >= tm1) && (tm0 >= tm2)) {
+		maxtm = tm0;
+	} else if ((tm1 >= tm0) && (tm1 >= tm2)) {
+		maxtm = tm1;
+	} else {
+		maxtm = tm2;
+	}
+	if (maxtm < 0) {
+		maxtm = 0;
+	}
 	return maxtm;
 }
-
 
 //#ifdef _output_alignment
 ///////////////////////////////////////////////////////////////////////////////
@@ -1078,53 +1005,50 @@ float CThermAlign::GetMeltingTempK(int i, int j)
 //  $              01jan10 LK : created
 //  #$
 
-void CThermAlign::PrintDPTable(ostream& outto)
-{
-    // print sequence 1
-    int c; // counter
-    outto<<"                   |"<<"         *         |";
-    for (c=0;c<seq1len;c++)
-        outto<<"         "<<seq1[c]<<"         |";
-    outto<<endl;
-    for (c=-1;c<=seq1len;c++)
-        outto<<"-------------------+";
-    outto<<endl;
-    // for all rows
-    for (int j=0;j<=seq2len;j++)
-    {
-        // for all three values in each cell
-        for (int k=0;k<3;k++)
-        {
-            // output character!
-            if (k==0)
-            {
-                if (j>0)
-                    outto<<"         "<<seq2[j-1]<<"         |";
-                else
-                    outto<<"         *         |";
-            }
-            else
-                outto<<"                   |";
-            // for all columns
-            for (int i=0;i<=seq1len;i++)
-            {
-                if (dH(i,j,k)==forbidden_enthalpy)
-                    outto<<"    forbidden      |";
-                else
-                {
-                    outto<<" ";
-                    outto<<setw(8)<<dH(i,j,k)<<" ";
-                    outto<<setw(8)<<dS(i,j,k)<<" |";
-                }
-            }
-            outto<<endl;
-        }
-        for (c=-1;c<=seq1len;c++)
-            outto<<"-------------------+";
-        outto<<endl;
-    }
-    outto<<endl<<endl;
-    outto<<flush;
+void CThermAlign::PrintDPTable(ostream& outto) {
+	// print sequence 1
+	int c; // counter
+	outto << "                   |" << "         *         |";
+	for (c = 0; c < seq1len; c++) {
+		outto << "         " << seq1[c] << "         |";
+	}
+	outto << endl;
+	for (c = -1; c <= seq1len; c++) {
+		outto << "-------------------+";
+	}
+	outto << endl;
+	// for all rows
+	for (int j = 0; j <= seq2len; j++) {
+		// for all three values in each cell
+		for (int k = 0; k < 3; k++) {
+			// output character!
+			if (k == 0) {
+				if (j > 0) {
+					outto << "         " << seq2[j - 1] << "         |";
+				} else {
+					outto << "         *         |";
+				}
+			} else
+				outto << "                   |";
+			// for all columns
+			for (int i = 0; i <= seq1len; i++) {
+				if (dH(i,j,k) == forbidden_enthalpy) {
+					outto << "    forbidden      |";
+				} else {
+					outto << " ";
+					outto << setw(8) << dH(i, j, k) << " ";
+					outto << setw(8) << dS(i, j, k) << " |";
+				}
+			}
+			outto << endl;
+		}
+		for (c = -1; c <= seq1len; c++) {
+			outto << "-------------------+";
+		}
+		outto << endl;
+	}
+	outto << endl << endl;
+	outto << flush;
 }
 
 //#endif

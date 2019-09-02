@@ -28,9 +28,7 @@
 
 #include <iostream>
 #include <strstream>
-//#include <ostream>
 #include "nnparams.h"  // Nearest Neighbor Parameters
-//#include "../gsfxtree/gsfxtree.h"             // Suffix Tree Stuff
 
 using namespace std;
 
@@ -43,21 +41,20 @@ using namespace std;
 
 typedef class CThermAlign* PThermAlign;
 
-class CThermAlign  
-{
+class CThermAlign {
 public:
 	CThermAlign(int, int, PNNParams);
 	virtual ~CThermAlign();
-	void InitStrings(char*,char*,int,int,int=0);
+	void InitStrings(char*, char*, int, int);
 	void InitBorder();
-	//void CalculateCell(int, int);
-	void CalculateTable(int=1);
+	void CalculateTable(int = 1);
 //	#ifdef _output_alignment
-	    void printAlignment(ostream &outputStream);
-		void OutputAlignment(ostream &outputStream);
-		bool OutputAlignment(ostream &outputStream, int, int, int, bool local=false);
-		void OutputLocalAlignment(ostream &outputStream);
-	    void PrintDPTable(ostream&);
+	void printAlignment(ostream &outputStream);
+	void OutputAlignment(ostream &outputStream);
+	bool OutputAlignment(ostream &outputStream, int, int, int, bool local =
+			false);
+	void OutputLocalAlignment(ostream &outputStream);
+	void PrintDPTable(ostream&);
 //	#endif
 	float GetEntropy(int, int);
 	float GetEnthalpy(int, int);
@@ -66,35 +63,28 @@ public:
 	float GetFreeEnergyC(int, int, float);
 	float GetMeltingTempC(int, int);
 	float GetMeltingTempK(int, int);
-// lk01feb07: removed maxlocstuff as not requiered by thermtreealign...
-	float maxloctm;      // maximum local temperature found
-	int maxloci;         // i position thereof
-	int maxlocj;         // j position thereof
-	int maxloct;         // and type of maximum alignment!
-    int targetNumber;    // id number of target sequence
-//    PGSfxLeaf probeNode; // identifier for probe sequence
-	char *seq1;         // Sequence 1
-	char *seq2;         // Sequence 2
-	int seq1len;        // Length of Sequence 1
-	int seq2len;        // Length of Sequence 2
-	int maxseq1len;     // length of longest target...
+	// lk01feb07: removed maxlocstuff as not requiered by thermtreealign...
+	float maxloctm;      	// maximum local temperature found
+	int maxloci;         	// i position thereof
+	int maxlocj;         	// j position thereof
+	int maxloct;         	// and type of maximum alignment!
+	int targetNumber;    	// id number of target sequence
+	char *seq1;         	// Sequence 1
+	char *seq2;         	// Sequence 2
+	int seq1len;        	// Length of Sequence 1
+	int seq2len;        	// Length of Sequence 2
+	int maxseq1len;     	// length of longest target...
 private:
-	float *dH;         // Dynamic Programming Table for Entropy
-	float *dS;         // Dynamic Programming Table for Enthalpy
-	PNNParams NNParams; // Nearest Neighbor parameters
-//	float forbidden_entropy;
+	float *dH;         		// Dynamic Programming Table for Entropy
+	float *dS;         		// Dynamic Programming Table for Enthalpy
+	PNNParams NNParams; 	// Nearest Neighbor parameters
 //#ifdef _output_alignment
 	ostrstream *s1aptr, *s2aptr, *atypptr;
-// Used to buffer aligned sequences (on output)
-	ostrstream s1align; 
+	// Used to buffer aligned sequences (on output)
+	ostrstream s1align;
 	ostrstream s2align;
 	ostrstream aligntype;   // insert, deletion, match, unmatch (for output)
 	// same for local alignment:
-	/*	removed lk00jan08: use global instead!
-	ostrstream ls1align;   
-	ostrstream ls2align;
-	ostrstream laligntype;  // insert, deletion, match, unmatch (for output)
-	*/
 //#endif
 };
 

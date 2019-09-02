@@ -29,9 +29,7 @@
 
 #include <iostream>
 #include <strstream>
-//#include <ostream>
-#include "nnparams.h"                         // Nearest Neighbor Parameters
-//#include "../gsfxtree/gsfxtree.h"             // Suffix Tree Stuff
+#include "nnparams.h"    // Nearest Neighbor Parameters
 
 using namespace std;
 
@@ -50,17 +48,17 @@ typedef struct TBasePair BasePair;
 
 typedef class GAlign* GGAlign;
 
-class GAlign  
-{
+class GAlign {
 public:
 	GAlign(int, int, PNNParams);
 	virtual ~GAlign();
-	void InitStrings(char*,char*,int,int,int=0);
+	void InitStrings(char*, char*, int, int);
 	void InitBorder();
-	void CalculateTable(int=1);
+	void CalculateTable(int = 1);
 //	#ifdef _output_alignment
-		bool OutputAlignment(ostream &outputStream, int, int, int, bool local=false);
-		void OutputLocalAlignment(ostream &outputStream);
+	bool OutputAlignment(ostream &outputStream, int, int, int, bool local =
+			false);
+	void OutputLocalAlignment(ostream &outputStream);
 //	#endif
 	float GetEntropy(int, int);
 	float GetEnthalpy(int, int);
@@ -72,39 +70,32 @@ public:
 	void printEnthalpyTable(int level);
 	void printEntropyTable(int level);
 
-// lk01feb07: removed maxlocstuff as not requiered by thermtreealign...
-	float maxlocg;      // maximum local dG value found
-	int maxloci;         // i position thereof
-	int maxlocj;         // j position thereof
-	int maxloct;         // and type of maximum alignment!
-    int targetNumber;    // id number of target sequence
-	// Modified by Flavio
-    	BasePair basePairs[2];
-        bool first = true;
-	// 
-//    PGSfxLeaf probeNode; // identifier for probe sequence
+	// lk01feb07: removed maxlocstuff as not requiered by thermtreealign...
+	float maxlocg;      	// maximum local dG value found
+	int maxloci;         	// i position thereof
+	int maxlocj;         	// j position thereof
+	int maxloct;         	// and type of maximum alignment!
+	int targetNumber;    	// id number of target sequence
+	BasePair basePairs[2];
+	bool first = true;
 private:
-	char *seq1;         // Sequence 1
-	char *seq2;         // Sequence 2
-	int seq1len;        // Length of Sequence 1
-	int seq2len;        // Length of Sequence 2
-	int maxseq1len;     // length of longest target...
-	float *dH;         // Dynamic Programming Table for Entropy
-	float *dS;         // Dynamic Programming Table for Enthalpy
-	PNNParams GNNParams; // Nearest Neighbor parameters
-//	float forbidden_entropy;
+	char *seq1;         	// Sequence 1
+	char *seq2;         	// Sequence 2
+	int seq1len;        	// Length of Sequence 1
+	int seq2len;        	// Length of Sequence 2
+	int maxseq1len;     	// length of longest target...
+	float *dH;         		// Dynamic Programming Table for Entropy
+	float *dS;         		// Dynamic Programming Table for Enthalpy
+	PNNParams GNNParams; 	// Nearest Neighbor parameters
+
 //#ifdef _output_alignment
 	ostrstream *s1aptr, *s2aptr, *atypptr;
-// Used to buffer aligned sequences (on output)
+	// Used to buffer aligned sequences (on output)
 	ostrstream s1align;
 	ostrstream s2align;
 	ostrstream aligntype;   // insert, deletion, match, unmatch (for output)
 	// same for local alignment:
-	/*	removed lk00jan08: use global instead!
-	ostrstream ls1align;   
-	ostrstream ls2align;
-	ostrstream laligntype;  // insert, deletion, match, unmatch (for output)
-	*/
+
 //#endif
 };
 
