@@ -173,17 +173,17 @@ void GAlign::InitBorder() {
 	maxloct = 0;
 
 	for (int i = 0; i <= seq1len; i++) {
-		dH(i,0,0) = 0.0f;
-		dH(i,0,1) = 0.0f;
-		dH(i,0,2) = 0.0f;
+		dH(i,0,0) = 0.0f; // GNNParams->GetInitialEnthalpy();
+		dH(i,0,1) = 0.0f; // GNNParams->GetInitialEnthalpy();
+		dH(i,0,2) = 0.0f; // GNNParams->GetInitialEnthalpy();
 		dS(i,0,0) = GNNParams->GetInitialEntropy();
 		dS(i,0,1) = GNNParams->GetInitialEntropy();
 		dS(i,0,2) = GNNParams->GetInitialEntropy();
 	}
 	for (int j = 1; j <= seq2len; j++) {
-		dH(0,j,0) = 0.0f;
-		dH(0,j,1) = 0.0f;
-		dH(0,j,2) = 0.0f;
+		dH(0,j,0) = 0.0f; // GNNParams->GetInitialEnthalpy();
+		dH(0,j,1) = 0.0f; // GNNParams->GetInitialEnthalpy();
+		dH(0,j,2) = 0.0f; // GNNParams->GetInitialEnthalpy();
 		dS(0,j,0) = GNNParams->GetInitialEntropy();
 		dS(0,j,1) = GNNParams->GetInitialEntropy();
 		dS(0,j,2) = GNNParams->GetInitialEntropy();
@@ -489,6 +489,7 @@ void GAlign::OutputLocalAlignment(ostream &outputStream) {
 	g1 = GNNParams->CalcG(dS(maxloci, maxlocj, 1), dH(maxloci, maxlocj, 1));
 	g2 = GNNParams->CalcG(dS(maxloci, maxlocj, 2), dH(maxloci, maxlocj, 2));
 
+        printf("dG0 = %.2f\ndG1 = %.2f\ndG2 = %.2f\n", g0, g1, g2);
 	if ((g0 >= g1) && (g0 >= g2)) {
 		maxloct = 0;
 	} else if ((g1 >= g0) && (g1 >= g2)) {
@@ -496,6 +497,7 @@ void GAlign::OutputLocalAlignment(ostream &outputStream) {
 	} else {
 		maxloct = 2;
 	}
+        printf("t = %d\n(%d, %d)\n", maxloct, maxloci, maxlocj);
 	bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, true);
 	s1align << '\0';
 	s2align << '\0';
@@ -594,24 +596,12 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t,
 				// printf("Last: %c/%c\n", seq1[i - 1], seq2[j - 1]);
 			}
 		}
-		h0 = dH(i - 1, j - 1, 0)
-				+ GNNParams->GetEnthalpy(prevchari, seq1[i - 1], prevcharj,
-						seq2[j - 1]);
-		h1 = dH(i - 1, j - 1, 1)
-				+ GNNParams->GetEnthalpy(prevchari, seq1[i - 1], '-',
-						seq2[j - 1]);
-		h2 = dH(i - 1, j - 1, 2)
-				+ GNNParams->GetEnthalpy('-', seq1[i - 1], prevcharj,
-						seq2[j - 1]);
-		s0 = dS(i - 1, j - 1, 0)
-				+ GNNParams->GetEntropy(prevchari, seq1[i - 1], prevcharj,
-						seq2[j - 1]);
-		s1 = dS(i - 1, j - 1, 1)
-				+ GNNParams->GetEntropy(prevchari, seq1[i - 1], '-',
-						seq2[j - 1]);
-		s2 = dS(i - 1, j - 1, 2)
-				+ GNNParams->GetEntropy('-', seq1[i - 1], prevcharj,
-						seq2[j - 1]);
+		h0 = dH(i - 1, j - 1, 0) + GNNParams->GetEnthalpy(prevchari, seq1[i - 1], prevcharj, seq2[j - 1]);
+		h1 = dH(i - 1, j - 1, 1) + GNNParams->GetEnthalpy(prevchari, seq1[i - 1], '-', seq2[j - 1]);
+		h2 = dH(i - 1, j - 1, 2) + GNNParams->GetEnthalpy('-', seq1[i - 1], prevcharj, seq2[j - 1]);
+		s0 = dS(i - 1, j - 1, 0) + GNNParams->GetEntropy(prevchari, seq1[i - 1], prevcharj, seq2[j - 1]);
+		s1 = dS(i - 1, j - 1, 1) + GNNParams->GetEntropy(prevchari, seq1[i - 1], '-', seq2[j - 1]);
+		s2 = dS(i - 1, j - 1, 2) + GNNParams->GetEntropy('-', seq1[i - 1], prevcharj, seq2[j - 1]);
 
 		if ((h0 == dH(i, j, 0)) && (s0 == dS(i, j, 0))) {
 			good = OutputAlignment(outputStream, i - 1, j - 1, 0, local);
@@ -658,16 +648,10 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t,
 			}
 		}
 	} else if (t == 1) {  // align (i,-)
-		h0 = dH(i - 1, j, 0)
-				+ GNNParams->GetEnthalpy(prevchari, seq1[i - 1], seq2[j - 1],
-						'-');
-		h1 = dH(i - 1, j, 1)
-				+ GNNParams->GetEnthalpy(prevchari, seq1[i - 1], '-', '-');
-		s0 = dS(i - 1, j, 0)
-				+ GNNParams->GetEntropy(prevchari, seq1[i - 1], seq2[j - 1],
-						'-');
-		s1 = dS(i - 1, j, 1)
-				+ GNNParams->GetEntropy(prevchari, seq1[i - 1], '-', '-');
+		h0 = dH(i - 1, j, 0) + GNNParams->GetEnthalpy(prevchari, seq1[i - 1], seq2[j - 1], '-');
+		h1 = dH(i - 1, j, 1) + GNNParams->GetEnthalpy(prevchari, seq1[i - 1], '-', '-');
+		s0 = dS(i - 1, j, 0) + GNNParams->GetEntropy(prevchari, seq1[i - 1], seq2[j - 1], '-');
+		s1 = dS(i - 1, j, 1) + GNNParams->GetEntropy(prevchari, seq1[i - 1], '-', '-');
 
 		if ((h0 == dH(i, j, 1)) && (s0 == dS(i, j, 1))) {
 			good = OutputAlignment(outputStream, i - 1, j, 0, local);
@@ -681,14 +665,10 @@ bool GAlign::OutputAlignment(ostream &outputStream, int i, int j, int t,
 			(*atypptr) << insertchar;
 		}
 	} else if (t == 2) {
-		h0 = dH(i, j - 1, 0) + GNNParams->GetEnthalpy(seq1[i - 1], '-', prevcharj,
-						seq2[j - 1]);
+		h0 = dH(i, j - 1, 0) + GNNParams->GetEnthalpy(seq1[i - 1], '-', prevcharj, seq2[j - 1]);
 		h2 = dH(i, j - 1, 2) + GNNParams->GetEnthalpy('-', '-', prevcharj, seq2[j - 1]);
-		s0 = dS(i, j - 1, 0)
-				+ GNNParams->GetEntropy(seq1[i - 1], '-', prevcharj,
-						seq2[j - 1]);
-		s2 = dS(i, j - 1, 2)
-				+ GNNParams->GetEntropy('-', '-', prevcharj, seq2[j - 1]);
+		s0 = dS(i, j - 1, 0) + GNNParams->GetEntropy(seq1[i - 1], '-', prevcharj, seq2[j - 1]);
+		s2 = dS(i, j - 1, 2) + GNNParams->GetEntropy('-', '-', prevcharj, seq2[j - 1]);
 
 		if ((h0 == dH(i, j, 2)) && (s0 == dS(i, j, 2))) {
 			good = OutputAlignment(outputStream, i, j - 1, 0, local);
@@ -883,5 +863,67 @@ float GAlign::GetMeltingTempK(int i, int j) {
 		maxg = 0;
 	}
 	return maxg;
+}
+
+//#ifdef _output_alignment
+///////////////////////////////////////////////////////////////////////////////
+//  FUNCTION:   void GAlign::PrintDPTable(ostream& outto)
+//
+//  PURPOSE:    Print Dynamic Programming table to stream
+//
+//  PARAMETERS:
+//      outto   - Output stream to use
+//
+//  RETURN VALUE:
+//      void
+//
+//  REVISION HISTORY
+//  $              01jan10 LK : created
+//  #$
+
+void GAlign::PrintDPTable(ostream& outto) {
+	// print sequence 1
+	int c; // counter
+	outto << "                   |" << "         *         |";
+	for (c = 0; c < seq1len; c++) {
+		outto << "         " << seq1[c] << "         |";
+	}
+	outto << endl;
+	for (c = -1; c <= seq1len; c++) {
+		outto << "-------------------+";
+	}
+	outto << endl;
+	// for all rows
+	for (int j = 0; j <= seq2len; j++) {
+		// for all three values in each cell
+		for (int k = 0; k < 3; k++) {
+			// output character!
+			if (k == 0) {
+				if (j > 0) {
+					outto << "         " << seq2[j - 1] << "         |";
+				} else {
+					outto << "         *         |";
+				}
+			} else
+				outto << "                   |";
+			// for all columns
+			for (int i = 0; i <= seq1len; i++) {
+				if (dH(i, j, k) == forbidden_enthalpy) {
+					outto << "    forbidden      |";
+				} else {
+					outto << " ";
+					outto << setw(8) << dH(i, j, k) << " ";
+					outto << setw(8) << dS(i, j, k) << " |";
+				}
+			}
+			outto << endl;
+		}
+		for (c = -1; c <= seq1len; c++) {
+			outto << "-------------------+";
+		}
+		outto << endl;
+	}
+	outto << endl << endl;
+	outto << flush;
 }
 

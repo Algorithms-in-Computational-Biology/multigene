@@ -306,6 +306,11 @@ public:
 		return -5.7f + rlogc;
 	}
 
+	inline float GetInitialEnthalpy() {
+		return 0.2f;
+	}
+
+
 	static char getComplement(char, bool = false);
 	static bool isMismatch(char, char);
 private:

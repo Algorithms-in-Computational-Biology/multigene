@@ -46,7 +46,7 @@ typedef struct TBasePair BasePair;
 //-----------------------------------------------------------------------------
 // class GAlign
 
-typedef class GAlign* GGAlign;
+typedef class GAlign *GGAlign;
 
 class GAlign {
 public:
@@ -69,6 +69,7 @@ public:
 
 	void printEnthalpyTable(int level);
 	void printEntropyTable(int level);
+        void PrintDPTable(ostream &outto);
 
 	// lk01feb07: removed maxlocstuff as not requiered by thermtreealign...
 	float maxlocg;      	// maximum local dG value found

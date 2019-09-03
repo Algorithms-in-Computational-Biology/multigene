@@ -224,15 +224,19 @@ BasePair *calculateThermodynamicAlignment(char *target1, char *primer1, PNNParam
     dinkelbach dinkel(params, &gAlign);
     dinkel.iteration(tempK);
     gAlign.OutputLocalAlignment(cout);
+    gAlign.PrintDPTable(cout);
 
     free(target);
     free(primer);
 
-    //printf("Tm = %.2f °C \n", gAlign.GetMeltingTempC(gAlign.maxloci, gAlign.maxlocj));
     printf("dH = %.2f cal/mol\n", gAlign.GetEnthalpy(gAlign.maxloci, gAlign.maxlocj));
     printf("dS = %.2f cal/K.mol (e.u)\n", gAlign.GetEntropy(gAlign.maxloci, gAlign.maxlocj));
-    printf("dG = %.2f kcal/mol at %0.0f °C\n", gAlign.GetFreeEnergyK(gAlign.maxloci, gAlign.maxlocj, t + 273.0f)/1000, t); // Temperature in K
-    tAlign.PrintDPTable(cout);
+    printf("dG = %.2f kcal/mol at %0.0f °C\n", gAlign.GetFreeEnergyK(gAlign.maxloci, gAlign.maxlocj, t + 273.15f)/1000, t); // Temperature in K
+    printf("Tm = %.2f °C \n", gAlign.GetMeltingTempC(gAlign.maxloci, gAlign.maxlocj));
+    
+    //gAlign.printEnthalpyTable(0);
+    //gAlign.printEnthalpyTable(1);
+    //gAlign.printEnthalpyTable(2);
 
     BasePair *pairs = (BasePair*) malloc(2 * sizeof(BasePair));
     memcpy(pairs, gAlign.basePairs, 2 * sizeof(BasePair));
