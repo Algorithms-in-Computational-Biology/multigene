@@ -28,6 +28,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef _pack
 #pragma pack(1)
@@ -239,6 +240,7 @@ public:
 			enthalpy = enthalpy * -1;
 			freeEnergy = enthalpy - new_TM * entropy;
 		}
+		//printf("dG = dH - T * dS = %.4f - %.4f * %.4f\n", enthalpy, entropy, new_TM);
 		return freeEnergy;
 	}
 

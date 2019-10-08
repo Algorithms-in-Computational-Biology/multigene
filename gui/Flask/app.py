@@ -1,6 +1,7 @@
 import StandardPCRPrimer as standard
 import MultigenePCRPrimer as multigene
 
+from wrapper import Multigene
 from flask import Flask
 from flask import render_template, request
 from wtforms import Form, SelectField, TextAreaField, IntegerField, validators
@@ -34,13 +35,15 @@ def search():
                  form.product_length.data]
 
         sequences = get_sequences(form.sequence.data)
-        #print(sequences)
+        print(sequences)
         if (form.pcr_type.data == '1'):
             result = standard.design(sequences[0], param)
         
             return render_template('standard_result.html',result=result)
         else:
-            result = multigene.design(sequences, param)
+            #result = multigene.design(sequences, param)
+            multigene = Multigene()
+            result = multigene.design(sequences)
 
             return render_template('multigene_result.html',result=result)
 

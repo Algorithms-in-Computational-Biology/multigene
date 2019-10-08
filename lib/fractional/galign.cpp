@@ -489,7 +489,7 @@ void GAlign::OutputLocalAlignment(ostream &outputStream) {
 	g1 = GNNParams->CalcG(dS(maxloci, maxlocj, 1), dH(maxloci, maxlocj, 1));
 	g2 = GNNParams->CalcG(dS(maxloci, maxlocj, 2), dH(maxloci, maxlocj, 2));
 
-        printf("dG0 = %.2f\ndG1 = %.2f\ndG2 = %.2f\n", g0, g1, g2);
+        //printf("dG0 = %.2f\ndG1 = %.2f\ndG2 = %.2f\n", g0, g1, g2);
 	if ((g0 >= g1) && (g0 >= g2)) {
 		maxloct = 0;
 	} else if ((g1 >= g0) && (g1 >= g2)) {
@@ -497,14 +497,14 @@ void GAlign::OutputLocalAlignment(ostream &outputStream) {
 	} else {
 		maxloct = 2;
 	}
-        printf("t = %d\n(%d, %d)\n", maxloct, maxloci, maxlocj);
+        //printf("t = %d\n(%d, %d)\n", maxloct, maxloci, maxlocj);
 	bool good = OutputAlignment(outputStream, maxloci, maxlocj, maxloct, true);
 	s1align << '\0';
 	s2align << '\0';
 	aligntype << '\0';
 	if (good) {
-		outputStream << s1align.str() << endl << aligntype.str() << endl
-				<< s2align.str() << endl << flush;
+		//outputStream << s1align.str() << endl << aligntype.str() << endl
+		//		<< s2align.str() << endl << flush;
 	} else
 		outputStream << "Alignment Error!" << endl << flush;
 

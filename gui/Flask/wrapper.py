@@ -8,7 +8,7 @@ import ctypes
 #print(k)
 
 class Primer(ctypes.Structure):
-	pass
+    pass
 
 Primer._fields_ = [("targetId", ctypes.c_int), 
 		("sequence", ctypes.POINTER(ctypes.c_char)),
@@ -25,7 +25,7 @@ Primer._fields_ = [("targetId", ctypes.c_int),
 
 
 class Pair(ctypes.Structure):
-	pass
+    pass
 
 Pair._fields_ = [("targetId", ctypes.c_int), 
 		("productSize", ctypes.c_int),
@@ -35,15 +35,16 @@ Pair._fields_ = [("targetId", ctypes.c_int),
 		("next", ctypes.POINTER(Pair))]
 
 class Multigene:
-	def __init__(self):
-		self.lib = ctypes.CDLL("./libteste.so")
-		self.lib.design.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_int]
-		self.lib.design.restype = ctypes.POINTER(Pair)
+    def __init__(self):
+        self.lib = ctypes.CDLL("./libteste.so")
+        self.lib.design.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_int]
+        self.lib.design.restype = ctypes.POINTER(Pair)
 
-	def design(self, targets):
-		size = len(targets)
-		_targets = (ctypes.c_char_p * size)()
-		_targets[:] = targets
+    def design(self, targets):
+        type(targets)
+        size = len(targets)
+        _targets = (ctypes.c_char_p * size)()
+        _targets[:] = targets
+        #print(_targets)
 
-		return self.lib.design(_targets, size - 1)
-
+        return self.lib.design(_targets, size - 1)
