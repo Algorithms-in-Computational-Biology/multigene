@@ -8,10 +8,15 @@ pair = multigene.design(targets)
 #print(pair.contents)
 #print(pair.contents.next is None)
 #print("%d %d %0.2f" % (pair.contents.targetId, pair.contents.productSize, pair.contents.freeEnergy))
+"""
+<!--pre> {{ sequence }}  if not item.next == NULL </pre-->
+<!--pre> {{ result.contents.next.next == NULL }}</pre-->	
+"""
 p = pair
 while(p): 
     forward = p.contents.forward
     reverse = p.contents.reverse
+    print type(p.contents)
     print("%d %d %0.2f" % (p.contents.targetId, p.contents.productSize, p.contents.freeEnergy))
     print("%d %d %d %d %0.2f %0.2f %0.2f %0.2f %0.2f" % (forward.contents.length, 
         forward.contents.position, 

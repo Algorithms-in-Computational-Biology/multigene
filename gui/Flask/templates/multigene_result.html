@@ -3,9 +3,7 @@
 <body>
 
 <h2>Result</h2>
-<!--pre> {{ sequence }}</pre-->
-
-{% for lst in result %}
+{% for item in result %}
   <h4>Id.</h4> 
   <table style="width:100%">
 	  <tr>
@@ -20,8 +18,7 @@
 	    <th>GC content</th>
 	    <th>Tm</th>
 	  </tr>
-	  {% for item in lst %}
-	    <tr>
+          <!--tr>
 	    <td>{{ item[1][0][0] }}</td>
 	    <td>{{ item[1][0][1] }}</td>
 	    <td>{{ item[1][0][2] }}</td>
@@ -32,12 +29,10 @@
 	    <td>{{ item[1][1][2] }}</td>
 	    <td>{{ item[1][1][3] }}</td>
 	    <td>{{ item[1][1][4] }}</td>
-	    </tr>
-	  {% endfor %}
+	  </tr-->
    </table>
    <br>
 {% endfor %}
-  
 <br>
 <p><a href="/primer-design">Back to parameter page</a></p>
 

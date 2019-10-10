@@ -16,6 +16,13 @@ def get_sequences(inputs):
             sequences.append(items[i])
     return sequences
 
+def convert(items):
+    l = []
+    item = items
+    while(item):
+        l.append(item)
+        item = item.contents.next
+    return l
 
 @app.route('/primer-design', methods=['GET', 'POST'])
 def search():
@@ -43,7 +50,7 @@ def search():
         else:
             #result = multigene.design(sequences, param)
             multigene = Multigene()
-            result = multigene.design(sequences)
+            result = convert(multigene.design(sequences))
 
             return render_template('multigene_result.html',result=result)
 

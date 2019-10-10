@@ -41,10 +41,9 @@ class Multigene:
         self.lib.design.restype = ctypes.POINTER(Pair)
 
     def design(self, targets):
-        type(targets)
-        size = len(targets)
-        _targets = (ctypes.c_char_p * size)()
-        _targets[:] = targets
-        #print(_targets)
+        length = len(targets)
+        _targets = (ctypes.c_char_p * length)()
+        for i in range(length):
+            _targets[i] = targets[i].encode('utf-8')
 
-        return self.lib.design(_targets, size - 1)
+        return self.lib.design(_targets, length - 1)
