@@ -8,28 +8,36 @@
   <table style="width:100%">
 	  <tr>
 	    <th>Forward primer (5'&rarr;3')</th>
-	    <th>Position</th>
-	    <th>Lenght</th> 
+	    <th>Length</th>
+	    <th>Position</th> 
 	    <th>GC content</th>
 	    <th>Tm</th>
+	    <th>dG (Hairpin)</th>
+	    <th>Elongation efficiency</th>
 	    <th>Reverse primer (3'&larr;5')</th>
-	    <th>Position</th>
-	    <th>Lenght</th> 
+	    <th>Length</th>
+	    <th>Position</th> 
 	    <th>GC content</th>
 	    <th>Tm</th>
+	    <th>dG (Hairpin)</th>
+	    <th>Elongation efficiency</th>
 	  </tr>
-          <!--tr>
-	    <td>{{ item[1][0][0] }}</td>
-	    <td>{{ item[1][0][1] }}</td>
-	    <td>{{ item[1][0][2] }}</td>
-	    <td>{{ item[1][0][3] }}</td>
-	    <td>{{ item[1][0][4] }}</td>
-	    <td>{{ item[1][1][0] }}</td>
-	    <td>{{ item[1][1][1] }}</td>
-	    <td>{{ item[1][1][2] }}</td>
-	    <td>{{ item[1][1][3] }}</td>
-	    <td>{{ item[1][1][4] }}</td>
-	  </tr-->
+          <tr>
+	    <td>{{ item.contents.forward.contents.sequence }}</td>
+	    <td>{{ item.contents.forward.contents.length }}</td>
+	    <td>{{ item.contents.forward.contents.position }}</td>
+	    <td>{{ item.contents.forward.contents.GCContent }}</td>
+	    <td>{{ item.contents.forward.contents.temperature }}</td>
+	    <td>{{ item.contents.forward.contents.freeEnergy }}</td>
+	    <td>{{ item.contents.forward.contents.forwardElongationEfficiency[0] }}</td>
+	    <td>{{ item.contents.reverse.contents.sequence }}</td>
+	    <td>{{ item.contents.reverse.contents.length }}</td>
+	    <td>{{ item.contents.reverse.contents.position }}</td>
+	    <td>{{ item.contents.reverse.contents.GCContent }}</td>
+	    <td>{{ item.contents.reverse.contents.temperature }}</td>
+	    <td>{{ item.contents.reverse.contents.freeEnergy }}</td>
+	    <td>{{ item.contents.reverse.contents.forwardElongationEfficiency[0] }}</td>
+	  </tr>
    </table>
    <br>
 {% endfor %}

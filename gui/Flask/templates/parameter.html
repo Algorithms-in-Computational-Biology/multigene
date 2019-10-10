@@ -19,7 +19,7 @@ li {
 
 <body>
 
-<h2>Primer Design</h2>
+<h2>Multigene Primer Design</h2>
 
 <form action="/primer-design" method="post">
 
@@ -32,27 +32,22 @@ li {
         {% endfor %}
     </ul>
   {% endif %}
-  
-  <div id="type">
-    {{ form.pcr_type.label }}<br>
-    {{ form.pcr_type }}
-
-  </div><br>
+   
   
   <div id="input">
     {{ form.sequence.label }}<br>	
     {{ form.sequence }}
   </div>
   
-  <div id="settings">
-    <h4>Settings</h4>
+  <div id="options">
+    <h3>Options</h3>
   <div>	
     Primer length:
   <div>
     {{ form.min_length.label }}
     {{ form.min_length }}
-    <!--{{ form.opt_length.label }}
-    {{ form.opt_length }}-->
+    {#{ form.opt_length.label }}
+    {{ form.opt_length }#}
     {{ form.max_length.label }}
     {{ form.max_length }}
   </div>
@@ -63,8 +58,8 @@ li {
   <div>
     {{ form.min_content.label }}	
     {{ form.min_content }}
-    <!--{{ form.opt_content.label }}
-    {{ form.opt_content }}-->
+    {#{ form.opt_content.label }}
+    {{ form.opt_content }#}
     {{ form.max_content.label }}
     {{ form.max_content }}
   </div>
@@ -75,18 +70,34 @@ li {
   <div>
     {{ form.min_tm.label }}
     {{ form.min_tm }}
-    <!--{{ form.opt_tm.label }}
-    {{ form.opt_tm }}-->
+    {#{ form.opt_tm.label }}
+    {{ form.opt_tm }#}
     {{ form.max_tm.label }}
     {{ form.max_tm }}
   </div>
   </div><br>
 
-  <div>	
-    {{ form.product_length.label }}	
   <div>
-    {{ form.product_length }}
+    Product length:	
+  <div>
+    {{ form.min_product_length.label }}	
+    {{ form.min_product_length }}
+    {{ form.max_product_length.label }}	
+    {{ form.max_product_length }}
+
   </div>
+  </div><br>
+
+  <div>
+    Concentration:	
+  <div>
+    {{ form.concentration_primer.label }}	
+    {{ form.concentration_primer }}
+    {{ form.concentration_strand.label }}	
+    {{ form.concentration_strand }}
+
+  </div>
+
   </div>
 
 </div>

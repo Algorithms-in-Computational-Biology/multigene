@@ -36,7 +36,8 @@ Pair._fields_ = [("targetId", ctypes.c_int),
 
 class Multigene:
     def __init__(self):
-        self.lib = ctypes.CDLL("./libteste.so")
+        #self.lib = ctypes.CDLL("./libteste.so")
+        self.lib = ctypes.CDLL("./multigene.so")
         self.lib.design.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_int]
         self.lib.design.restype = ctypes.POINTER(Pair)
 
@@ -46,4 +47,4 @@ class Multigene:
         for i in range(length):
             _targets[i] = targets[i].encode('utf-8')
 
-        return self.lib.design(_targets, length - 1)
+        return self.lib.design(_targets, length)

@@ -1,6 +1,8 @@
 g++ -c -O3 -Wno-deprecated -Wall -fpic teste.c
 g++ -shared -o libteste.so teste.o
 
+g++ -shared -o multigene.so multigene.o
+
 https://dbader.org/blog/python-ctypes-tutorial
 https://docs.python.org/3/library/ctypes.html#calling-functions
 https://cai.tools.sap/blog/how-to-speed-up-python-with-c/

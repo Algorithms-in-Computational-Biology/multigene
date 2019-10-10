@@ -28,5 +28,5 @@ struct TPair {
 };
 typedef TPair Pair;
 
-Pair *design(char **targets, int m);
+extern "C" Pair *design(char **targets, int m);
 #endif
