@@ -1,5 +1,5 @@
-import StandardPCRPrimer as standard
-import MultigenePCRPrimer as multigene
+#import StandardPCRPrimer as standard
+#import MultigenePCRPrimer as multigene
 
 from wrapper import Multigene
 from flask import Flask

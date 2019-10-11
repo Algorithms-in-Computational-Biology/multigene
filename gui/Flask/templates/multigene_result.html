@@ -3,7 +3,6 @@
 <body>
 
 <h2>Result</h2>
-{% for item in result %}
   <h4>Id.</h4> 
   <table style="width:100%">
 	  <tr>
@@ -22,25 +21,25 @@
 	    <th>dG (Hairpin)</th>
 	    <th>Elongation efficiency</th>
 	  </tr>
-          <tr>
-	    <td>{{ item.contents.forward.contents.sequence }}</td>
-	    <td>{{ item.contents.forward.contents.length }}</td>
-	    <td>{{ item.contents.forward.contents.position }}</td>
-	    <td>{{ item.contents.forward.contents.GCContent }}</td>
-	    <td>{{ item.contents.forward.contents.temperature }}</td>
-	    <td>{{ item.contents.forward.contents.freeEnergy }}</td>
-	    <td>{{ item.contents.forward.contents.forwardElongationEfficiency[0] }}</td>
-	    <td>{{ item.contents.reverse.contents.sequence }}</td>
-	    <td>{{ item.contents.reverse.contents.length }}</td>
-	    <td>{{ item.contents.reverse.contents.position }}</td>
-	    <td>{{ item.contents.reverse.contents.GCContent }}</td>
-	    <td>{{ item.contents.reverse.contents.temperature }}</td>
-	    <td>{{ item.contents.reverse.contents.freeEnergy }}</td>
-	    <td>{{ item.contents.reverse.contents.forwardElongationEfficiency[0] }}</td>
-	  </tr>
+          {% for item in result %}
+            <tr>
+	      <td>{{ item.contents.forward.contents.sequence }}</td>
+	      <td>{{ item.contents.forward.contents.length }}</td>
+	      <td>{{ item.contents.forward.contents.position }}</td>
+	      <td>{{ item.contents.forward.contents.GCContent|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.temperature|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.freeEnergy|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.forwardElongationEfficiency[0]|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.sequence }}</td>
+	      <td>{{ item.contents.reverse.contents.length }}</td>
+	      <td>{{ item.contents.reverse.contents.position }}</td>
+	      <td>{{ item.contents.reverse.contents.GCContent|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.temperature|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.freeEnergy|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.forwardElongationEfficiency[0]|round(2) }}</td>
+	    </tr>
+          {% endfor %}
    </table>
-   <br>
-{% endfor %}
 <br>
 <p><a href="/primer-design">Back to parameter page</a></p>
 

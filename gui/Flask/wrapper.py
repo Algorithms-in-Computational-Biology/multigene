@@ -11,7 +11,7 @@ class Primer(ctypes.Structure):
     pass
 
 Primer._fields_ = [("targetId", ctypes.c_int), 
-		("sequence", ctypes.POINTER(ctypes.c_char)),
+		("sequence", ctypes.c_char_p),
 		("length", ctypes.c_int),
 		("position", ctypes.c_int),
 		("forward", ctypes.c_bool),
