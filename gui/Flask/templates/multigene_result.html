@@ -6,14 +6,14 @@
   <h4>Id.</h4> 
   <table style="width:100%">
 	  <tr>
-	    <th>Forward primer (5'&rarr;3')</th>
+	    <th>Forward primer</th>
 	    <th>Length</th>
 	    <th>Position</th> 
 	    <th>GC content</th>
 	    <th>Tm</th>
 	    <th>dG (Hairpin)</th>
 	    <th>Elongation efficiency</th>
-	    <th>Reverse primer (3'&larr;5')</th>
+	    <th>Reverse primer</th>
 	    <th>Length</th>
 	    <th>Position</th> 
 	    <th>GC content</th>
@@ -23,20 +23,20 @@
 	  </tr>
           {% for item in result %}
             <tr>
-	      <td>{{ item.contents.forward.contents.sequence }}</td>
+	      <td>{{ item.contents.forward.contents.sequence.decode("utf-8") }}</td>
 	      <td>{{ item.contents.forward.contents.length }}</td>
 	      <td>{{ item.contents.forward.contents.position }}</td>
 	      <td>{{ item.contents.forward.contents.GCContent|round(2) }}</td>
 	      <td>{{ item.contents.forward.contents.temperature|round(2) }}</td>
 	      <td>{{ item.contents.forward.contents.freeEnergy|round(2) }}</td>
 	      <td>{{ item.contents.forward.contents.forwardElongationEfficiency[0]|round(2) }}</td>
-	      <td>{{ item.contents.reverse.contents.sequence }}</td>
+	      <td>{{ item.contents.reverse.contents.sequence.decode("utf-8") }}</td>
 	      <td>{{ item.contents.reverse.contents.length }}</td>
 	      <td>{{ item.contents.reverse.contents.position }}</td>
 	      <td>{{ item.contents.reverse.contents.GCContent|round(2) }}</td>
 	      <td>{{ item.contents.reverse.contents.temperature|round(2) }}</td>
 	      <td>{{ item.contents.reverse.contents.freeEnergy|round(2) }}</td>
-	      <td>{{ item.contents.reverse.contents.forwardElongationEfficiency[0]|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.reverseElongationEfficiency[0]|round(2) }}</td>
 	    </tr>
           {% endfor %}
    </table>
