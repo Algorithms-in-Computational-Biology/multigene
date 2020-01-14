@@ -10,26 +10,26 @@ import ctypes
 class Primer(ctypes.Structure):
     pass
 
-Primer._fields_ = [("targetId", ctypes.c_int), 
+Primer._fields_ = [("target_id", ctypes.c_int), 
 		("sequence", ctypes.c_char_p),
 		("length", ctypes.c_int),
 		("position", ctypes.c_int),
 		("forward", ctypes.c_bool),
 		("reverse", ctypes.c_bool),
-		("GCContent", ctypes.c_float),
+		("gc_content", ctypes.c_float),
 		("temperature", ctypes.c_float),
-		("freeEnergy", ctypes.c_float),
-		("forwardElongationEfficiency", ctypes.POINTER(ctypes.c_float)),
-		("reverseElongationEfficiency", ctypes.POINTER(ctypes.c_float)),
+		("free_energy", ctypes.c_float),
+		("forward_elongation_efficiency", ctypes.POINTER(ctypes.c_float)),
+		("reverse_elongation_efficiency", ctypes.POINTER(ctypes.c_float)),
 		("next", ctypes.POINTER(Primer))]
 
 
 class Pair(ctypes.Structure):
     pass
 
-Pair._fields_ = [("targetId", ctypes.c_int), 
-		("productSize", ctypes.c_int),
-		("freeEnergy", ctypes.c_float),
+Pair._fields_ = [("target_id", ctypes.c_int), 
+		("product_size", ctypes.c_int),
+		("free_energy", ctypes.c_float),
 		("forward", ctypes.POINTER(Primer)),
 		("reverse", ctypes.POINTER(Primer)),
 		("next", ctypes.POINTER(Pair))]

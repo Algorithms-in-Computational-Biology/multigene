@@ -26,17 +26,17 @@
 	      <td>{{ item.contents.forward.contents.sequence.decode("utf-8") }}</td>
 	      <td>{{ item.contents.forward.contents.length }}</td>
 	      <td>{{ item.contents.forward.contents.position }}</td>
-	      <td>{{ item.contents.forward.contents.GCContent|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.gc_content|round(2) }}</td>
 	      <td>{{ item.contents.forward.contents.temperature|round(2) }}</td>
-	      <td>{{ item.contents.forward.contents.freeEnergy|round(2) }}</td>
-	      <td>{{ item.contents.forward.contents.forwardElongationEfficiency[0]|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.free_energy|round(2) }}</td>
+	      <td>{{ item.contents.forward.contents.forward_elongation_efficiency[0]|round(2) }}</td>
 	      <td>{{ item.contents.reverse.contents.sequence.decode("utf-8") }}</td>
 	      <td>{{ item.contents.reverse.contents.length }}</td>
 	      <td>{{ item.contents.reverse.contents.position }}</td>
-	      <td>{{ item.contents.reverse.contents.GCContent|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.gc_content|round(2) }}</td>
 	      <td>{{ item.contents.reverse.contents.temperature|round(2) }}</td>
-	      <td>{{ item.contents.reverse.contents.freeEnergy|round(2) }}</td>
-	      <td>{{ item.contents.reverse.contents.reverseElongationEfficiency[0]|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.free_energy|round(2) }}</td>
+	      <td>{{ item.contents.reverse.contents.reverse_elongation_efficiency[0]|round(2) }}</td>
 	    </tr>
           {% endfor %}
    </table>

@@ -116,7 +116,6 @@ void CNNParams::InitParams(float c1, float c2, float kp, int sm) {
 			ndS(5,x,y,0)=forbidden_entropy;
 			ndH(0,x,y,5)=forbidden_enthalpy;
 			ndS(0,x,y,5)=forbidden_entropy;
-
 		}
 		// also, forbid x-/-- and --/x-, i.e. no two inner gaps paired
 		ndH(x,0,0,0)=forbidden_enthalpy;
