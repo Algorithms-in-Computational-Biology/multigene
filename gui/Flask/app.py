@@ -34,7 +34,7 @@ def search():
                  form.min_product_length.data,
                  form.max_product_length.data,
                  form.primer_concentration.data,
-                 form.strand_concentration.data]
+                 form.template_concentration.data]
 
         multigene = Multigene()
         sequences = get_sequences(form.sequence.data)
@@ -62,4 +62,4 @@ class ParameterForm(Form):
     max_product_length = IntegerField('Max.', [validators.Required("Maximum product length is required.")], default=1200)
 
     primer_concentration = DecimalField('Primer', [validators.Required("Primer concentration is required.")], places=6, default=0.000001)
-    strand_concentration = DecimalField('Strand', [validators.Required("Strand concentration is required.")], places=6, default=0.000001)
+    template_concentration = DecimalField('Template', [validators.Required("Template concentration is required.")], places=6, default=0.000001)
