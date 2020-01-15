@@ -16,8 +16,11 @@ all: folder multigene.o
 folder:
 	mkdir -p $(OBJ) $(BIN)
 
-teste.o: dinkelbach.o thermalign.o
+teste: dinkelbach.o thermalign.o
 	$(CC) $(CFLAGS) -o $(BIN)/teste $(SRC)/teste.cpp $(OBJ)/*.o $(INCLUDE) $(FRACT)
+
+multigene: dinkelbach.o thermalign.o stree_strmat.o stree_ukkonen.o 
+	$(CC) $(CFLAGS) -o $(BIN)/multigene $(SRC)/multigene.cpp $(OBJ)/*.o $(INCLUDE) $(STREE) $(INCLUDE) $(FRACT) 
 
 multigene.so:
 	g++ -shared -o ./gui/Flask/$@ $(OBJ)/*.o

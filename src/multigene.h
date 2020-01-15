@@ -30,5 +30,6 @@ struct TPair
 };
 typedef TPair Pair;
 
-extern "C" Pair *design(char **targets, int m);
+// extern "C" Pair *design(char **targets, int m);
+Pair *design(char **targets, int m);
 #endif
