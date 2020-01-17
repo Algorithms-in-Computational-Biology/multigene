@@ -1,16 +1,9 @@
 import ctypes
 
-#lib = ctypes.cdll.LoadLibrary("./libteste.so")
-
-#lib.getK.argtypes = [ctypes.c_float, ctypes.c_float]
-#lib.getK.restype = ctypes.c_double
-#k = lib.getK(28.5, 154.6)
-#print(k)
-
 class Primer(ctypes.Structure):
     pass
 
-Primer._fields_ = [("target_id", ctypes.c_int), 
+Primer._fields_ = [("target_id", ctypes.c_char_p), 
 		("sequence", ctypes.c_char_p),
 		("length", ctypes.c_int),
 		("position", ctypes.c_int),
@@ -23,11 +16,10 @@ Primer._fields_ = [("target_id", ctypes.c_int),
 		("reverse_elongation_efficiency", ctypes.POINTER(ctypes.c_float)),
 		("next", ctypes.POINTER(Primer))]
 
-
 class Pair(ctypes.Structure):
     pass
 
-Pair._fields_ = [("target_id", ctypes.c_int), 
+Pair._fields_ = [("target_id", ctypes.c_char_p), 
 		("product_size", ctypes.c_int),
 		#("free_energy", ctypes.c_float),
 		("forward", ctypes.POINTER(Primer)),
@@ -40,7 +32,6 @@ class Target(ctypes.Structure):
 
 class Multigene:
 	def __init__(self):
-		#pass
 		#self.lib = ctypes.CDLL("./libteste.so")
 		self.lib = ctypes.CDLL("./multigene.so")
 		#self.lib.design.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_int]
@@ -62,15 +53,6 @@ class Multigene:
 			_id = str(i).encode('utf-8')
 			_sequence = targets[i].encode('utf-8')
 			_targets[i] = Target(_id, _sequence)
-			print(_targets[i].id, _targets[i].sequence)
+			#print(_targets[i].id, _targets[i].sequence)
 
 		return self.lib.design(_targets, length)
-		
-#targets = ["ACG", "ACGT"]
-#multigene = Multigene()
-#_targets = multigene.design(targets)
-#for i in range(len(_targets)):
-#	print(_targets[i].id, _targets[i].sequence)
-
-#target = Target("1".encode('utf-8'), "ACTG".encode('utf-8'))
-#print(target.id, target.sequence)

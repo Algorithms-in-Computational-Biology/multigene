@@ -37,7 +37,6 @@ struct TTarget
 };
 typedef TTarget Target;
 
-// extern "C" Pair *design(char **targets, int m);
-extern "C" Pair *design(Target *targets, int m);
-// Pair *design(Target *targets, int m);
+// extern "C" Pair *design(Target *targets, int m);
+Pair *design(Target *targets, int m);
 #endif
