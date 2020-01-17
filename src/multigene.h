@@ -31,13 +31,13 @@ struct TPair
 typedef TPair Pair;
 
 struct TTarget
-	{
-		char *id;
-		char *sequence;
-	};
-	typedef TTarget Target;
+{
+	char *id;                   // Target sequence identification
+	char *sequence;             // Target sequence
+};
+typedef TTarget Target;
 
 // extern "C" Pair *design(char **targets, int m);
-// Pair *design(char **targets, int m);
-Pair *design(Target *targets, int m);
+extern "C" Pair *design(Target *targets, int m);
+// Pair *design(Target *targets, int m);
 #endif

@@ -17,6 +17,7 @@ def convert(items):
     l = []
     item = items
     while(item):
+        print(item) 
         l.append(item)
         item = item.contents.next
     return l
