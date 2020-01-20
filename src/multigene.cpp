@@ -8,7 +8,7 @@
 #include "multigene.h"
 #include "stree_ukkonen.h"
 
-#define DEBUG
+// #define DEBUG
 
 using namespace std;
 
@@ -635,8 +635,8 @@ SUFFIX_TREE build_gstree(Target *targets, int m, int j)
 	return tree;
 }
 
-// extern "C" Pair *design(Target *targets, int m) 
-Pair *design(Target *targets, int m) 
+extern "C" Pair *design(Target *targets, int m) 
+// Pair *design(Target *targets, int m) 
 {
 	// Always use the register keyword in loops, because it is faster
 	register int i, j, k;
@@ -829,7 +829,7 @@ Pair *design(Target *targets, int m)
 	return result;
 }
 
-int main(void) {
+/*int main(void) {
 	int m = 2;
 
 	// Rapid memory test
@@ -866,4 +866,4 @@ int main(void) {
 	delete_pair_list(&result);
 
 	return 0;
-}
+}*/

@@ -10,9 +10,9 @@ make
 ```
 
 # Running
-Go to folder multigene 
+Go to folder
 
-cd ./multigene 
+cd ./multigene/gui/Flask 
 
 Open the terminal and execute the command 
 
