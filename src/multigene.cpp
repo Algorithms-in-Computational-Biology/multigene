@@ -631,7 +631,6 @@ SUFFIX_TREE build_gstree(Target *targets, int m, int j)
 #ifdef _DEBUG	
 	printf("...\n");
 #endif
-
 	return tree;
 }
 

@@ -124,8 +124,8 @@ extern "C" Pair *design(char **targets, int m)
 		//printf("%s %d\n", targets[i], i);
 	}
 	Primer *forward = newPrimer(targets[0], 1, m);
-        forward->position = 1;
-        forward->targetId = 1;
+    forward->position = 1;
+    forward->targetId = 1;
 	forward->forward = true;
 	forward->reverse = false;
 	forward->GCContent = 1.1;
@@ -135,8 +135,8 @@ extern "C" Pair *design(char **targets, int m)
 	forward->reverseElongationEfficiency[0] = 0.25;
 
 	Primer *reverse = newPrimer(targets[1], 1, m);
-        reverse->position = 2;
-        reverse->targetId = 1;
+    reverse->position = 2;
+    reverse->targetId = 1;
 	reverse->forward = false;
 	reverse->reverse = true;
 	reverse->GCContent = 1.2;
@@ -144,7 +144,6 @@ extern "C" Pair *design(char **targets, int m)
 	reverse->freeEnergy = -0.5;
 	reverse->forwardElongationEfficiency[0] = 0.35;
 	reverse->reverseElongationEfficiency[0] = 0.45;
-
 
 	Pair *pairs = NULL;
 	Pair *pair = newPair(forward, reverse, m);

@@ -42,10 +42,8 @@ int dinkelbach::iteration(float TempK) {
 		if (lambda < 0.0) {
 			if (!positive) {
 				//Initial melting temperature greater than expected
-				newTM = myGAlign->GetEnthalpy(myGAlign->maxloci,
-						myGAlign->maxlocj)
-						/ myGAlign->GetEntropy(myGAlign->maxloci,
-								myGAlign->maxlocj) - 1;
+				newTM = myGAlign->GetEnthalpy(myGAlign->maxloci, myGAlign->maxlocj)
+						/ myGAlign->GetEntropy(myGAlign->maxloci, myGAlign->maxlocj) - 1;
 				lambda = oldlambda;
 				myDinkParams->AlterTM(newTM);
 			} else {
@@ -54,8 +52,7 @@ int dinkelbach::iteration(float TempK) {
 		} else {
 			positive = 1;
 			oldTM = newTM;
-			newTM = myGAlign->GetMeltingTempK(myGAlign->maxloci,
-					myGAlign->maxlocj);
+			newTM = myGAlign->GetMeltingTempK(myGAlign->maxloci, myGAlign->maxlocj);
 			myDinkParams->AlterTM(newTM);
 		}
 	} while (!positive

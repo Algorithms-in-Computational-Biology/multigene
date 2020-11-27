@@ -7,9 +7,9 @@
 #include "dinkelbach.h"
 #include "multigene.h"
 
-float primerConcentration = 0.000001;
-float templateConcentration = 0.000001;
-float saltConcentration = 1; // K
+float primer_concentration = 0.00001;
+float template_concentration = 0.00001;
+float salt_concentration = 1; // K
 float t = 37.0f; // Temperature in C
 
 float efficiency[4][4] = {{0.0130, 0.3359, 0.0019, 1},
@@ -36,7 +36,7 @@ float efficiency[4][4] = {{0.0130, 0.3359, 0.0019, 1},
         return complement;
     }
 */
-char getComplementaryBase(char base)
+char get_complementary_base(char base)
 {
     if (base == 'A')
     {
@@ -57,23 +57,23 @@ char getComplementaryBase(char base)
     return 'A';
 }
 
-char* calculateComplement(char *sequence, int n)
+char *calculate_complement(char *sequence, int n)
 {
     register int i;
-    char* complement = (char*) malloc((n + 1)*sizeof(char));
+    char *complement = (char*) malloc((n + 1) * sizeof(char));
     for (i = 0; i < n; i++)
     {
-        complement[i] = getComplementaryBase(sequence[i]);
+        complement[i] = get_complementary_base(sequence[i]);
     }
     complement[n] = '\0';
 
     return complement;
 }
 
-char* calculateReverse(char *sequence, int n)
+char *calculate_reverse(char *sequence, int n)
 {
     register int i;
-    char* reverse = (char*) malloc((n + 1)*sizeof(char));
+    char *reverse = (char *) malloc((n + 1) * sizeof(char));
     for (i = n - 1; i >= 0; i--)
     {
         reverse[n - i - 1] = sequence[i];
@@ -83,20 +83,20 @@ char* calculateReverse(char *sequence, int n)
     return reverse;
 }
 
-char* calculateReverseComplement(char *sequence, int n)
+char *calculate_reverse_complement(char *sequence, int n)
 {
     register int i;
-    char* reverse = (char*) malloc((n + 1)*sizeof(char));
+    char *reverse = (char *) malloc((n + 1) * sizeof(char));
     for (i = n - 1; i >= 0; i--)
     {
-        reverse[n - i - 1] = getComplementaryBase(sequence[i]);
+        reverse[n - i - 1] = get_complementary_base(sequence[i]);
     }
     reverse[n] = '\0';
 
     return reverse;
 }
 
-int convertBase(char base) {
+int convert_base(char base) {
     if (base == 'A') {
         return 1;
     } else if (base == 'C') {
@@ -108,17 +108,17 @@ int convertBase(char base) {
     }
 }
 
-float calculateElongationEfficiency(char target, char primer) {
-	int i = convertBase(target);
-	int j = convertBase(primer);
+float calculate_elongation_efficiency(char target, char primer) {
+	int i = convert_base(target);
+	int j = convert_base(primer);
 
 	return efficiency[i - 1][j - 1] * 100;
 }
 
-char *addSigns(char *sequence)
+char *add_signs(char *sequence)
 {
     int n = strlen(sequence);
-    char *str = (char*) malloc((n + 3) * sizeof(char));
+    char *str = (char *) malloc((n + 3) * sizeof(char));
     str[0] = '$';
     for(int i = 0; i < n; i++)
     {
@@ -130,18 +130,18 @@ char *addSigns(char *sequence)
     return str;
 }
 
-bool isPerfectComplement(char *target, char *primer)
+bool is_perfect_complement(char *target, char *primer)
 {
     register int k;
-    int primerLength = strlen(primer);
-    int targetLength = strlen(target);
-    if (targetLength != primerLength)
+    int primer_length = strlen(primer);
+    int target_length = strlen(target);
+    if (target_length != primer_length)
     {
         return false;
     }
-    for(k = 0; k < primerLength; k++)
+    for(k = 0; k < primer_length; k++)
     {
-        if (primer[k] != getComplementaryBase(target[k]))
+        if (primer[k] != get_complementary_base(target[k]))
         {
             return false;
         }
@@ -149,28 +149,28 @@ bool isPerfectComplement(char *target, char *primer)
     return true;
 }
 
-float calculateMeltingTemperature (char *target1, char *primer1, PNNParams params)
+float calculate_melting_temperature (char *target1, char *primer1, PNNParams params)
 {
-    char *target = addSigns(target1);
-    char *primer = addSigns(primer1);
+    char *target = add_signs(target1);
+    char *primer = add_signs(primer1);
 
-    int primerLength = strlen(primer);
-    int targetLength = strlen(target);
+    int primer_length = strlen(primer);
+    int target_length = strlen(target);
 
-    CThermAlign tAlign(targetLength, primerLength, params);
-    tAlign.InitStrings(target, primer, targetLength, primerLength);
+    CThermAlign tAlign(target_length, primer_length, params);
+    tAlign.InitStrings(target, primer, target_length, primer_length);
     tAlign.CalculateTable();
     float temperature;
-    if (isPerfectComplement(target, primer))
+    if (is_perfect_complement(target, primer))
     {
         temperature = tAlign.GetMeltingTempC(tAlign.maxloci, tAlign.maxlocj);
     }
     else
     {
         float tempK = tAlign.GetMeltingTempK(tAlign.maxloci, tAlign.maxlocj);
-        GAlign gAlign(targetLength, primerLength,params);
+        GAlign gAlign(target_length, primer_length, params);
 
-        gAlign.InitStrings(target, primer, targetLength, primerLength);
+        gAlign.InitStrings(target, primer, target_length, primer_length);
         dinkelbach dinkel(params, &gAlign);
         dinkel.iteration(tempK);
         temperature =  gAlign.GetMeltingTempC(gAlign.maxloci, gAlign.maxlocj);
@@ -181,22 +181,22 @@ float calculateMeltingTemperature (char *target1, char *primer1, PNNParams param
     return temperature;
 }
 
-float calculateFreeEnergy(char *target1, char *primer1, PNNParams params, float t)
+float calculate_free_energy(char *target1, char *primer1, PNNParams params, float t)
 {
-    char *target = addSigns(target1);
-    char *primer = addSigns(primer1);
+    char *target = add_signs(target1);
+    char *primer = add_signs(primer1);
 
-    int primerLength = strlen(primer);
-    int targetLength = strlen(target);
+    int primer_length = strlen(primer);
+    int target_length = strlen(target);
 
-    CThermAlign tAlign(targetLength, primerLength, params);
-    tAlign.InitStrings(target, primer, targetLength, primerLength);
+    CThermAlign tAlign(target_length, primer_length, params);
+    tAlign.InitStrings(target, primer, target_length, primer_length);
     tAlign.CalculateTable();
 
     float tempK = tAlign.GetMeltingTempK(tAlign.maxloci, tAlign.maxlocj);
-    GAlign gAlign(targetLength, primerLength,params);
+    GAlign gAlign(target_length, primer_length, params);
 
-    gAlign.InitStrings(target, primer, targetLength, primerLength);
+    gAlign.InitStrings(target, primer, target_length, primer_length);
     dinkelbach dinkel(params, &gAlign);
     dinkel.iteration(tempK);
 
@@ -206,21 +206,21 @@ float calculateFreeEnergy(char *target1, char *primer1, PNNParams params, float 
     return -gAlign.GetFreeEnergyK(gAlign.maxloci, gAlign.maxlocj, t + 273.0f);
 }
 
-BasePair *calculateThermodynamicAlignment(char *target1, char *primer1, PNNParams params)
+BasePair *calculate_thermodynamic_alignment(char *target1, char *primer1, PNNParams params)
 {
-    char *target = addSigns(target1);
-    char *primer = addSigns(primer1);
+    char *target = add_signs(target1);
+    char *primer = add_signs(primer1);
 
-    int primerLength = strlen(primer);
-    int targetLength = strlen(target);
+    int primer_length = strlen(primer);
+    int target_length = strlen(target);
 
-    CThermAlign tAlign(targetLength, primerLength, params);
-    tAlign.InitStrings(target, primer, targetLength, primerLength);
+    CThermAlign tAlign(target_length, primer_length, params);
+    tAlign.InitStrings(target, primer, target_length, primer_length);
     tAlign.CalculateTable();
     float tempK = tAlign.GetMeltingTempK(tAlign.maxloci, tAlign.maxlocj);
 
-    GAlign gAlign(targetLength, primerLength,params);
-    gAlign.InitStrings(target, primer, targetLength, primerLength);
+    GAlign gAlign(target_length, primer_length, params);
+    gAlign.InitStrings(target, primer, target_length, primer_length);
     dinkelbach dinkel(params, &gAlign);
     dinkel.iteration(tempK);
     gAlign.OutputLocalAlignment(cout);
@@ -248,8 +248,9 @@ BasePair *calculateThermodynamicAlignment(char *target1, char *primer1, PNNParam
 
 int main(void)
 {
-    PNNParams params = new CNNParams();
-    params->InitParams(primerConcentration, templateConcentration, saltConcentration, SALT_METHOD_SANTALUCIA);
+    CNNParams params;
+    params.InitParams(primer_concentration, template_concentration, 
+        salt_concentration, SALT_METHOD_SANTALUCIA);
 
     int m = 1;
     //TACTACTCAATACCGTGTACCG
@@ -268,16 +269,18 @@ int main(void)
     //char* targets[m] = {"ATGTTGGCTGTGTTGGCTCCTCGATTGTTCTCCTCTGTAACCACTCGTGTGGTGACGGTGAGCCGATGGCAACCACGATGGTGACTGGTTACAAGCTTGGGATTGTTCACGTGAGAAACTGGAGCACTGTGGCTGTAGGTGAGAAGGAGCAGGAGGAGAAGAAACAGGCGACGGAAACAGCCGGTGTCGGTAACAACAAGGAAGAGAAAAGGATCGGAGTTACTGGGGTGTGGAAGTTCCGAAGGTCACTAAAGAAGATGGGACTGAATGGCGATGGAACTGCTTTAGGCCATGGGAGACTTACAAAGCTGACTTATCCATTGATCTGAAGAAACACCATGCGCCAGCAACATTTTTGGACAAAATGGCCTTTTGGACCGTGAAAGCTCTAAGATGGCCAACTGATTTGTTCTTCCAGAGGAGATATGGGTGCCGGGCAATGATGCTTGAGACGGTGGCAGCCGTGCCGGGAATGGTGGGAGGCTTGCTGTTGCACTGCAAGTCATTGAGGAAATTTGAGCACAGCGGGGGCTGGATCAAGGCGCTTTTGGAAGAAGCCGAAAACGAGAGAATGCATCTAATGACTTTCATGGAGGTGGCCAAGCCCAgGTGGTACGAGAGGGCTCTGGTTTTCGCAGTCCAAGGTGTATTCTTCAACGCCTACTTCCTGGGCTATTTGATCTCTCCGAAATTCGCTCACCGCATGGTCGGCTACCTGGAAGAAGAAGCAATTCACTCaTACACAGAATTCCTCAAAGAATTGGACAAAGGTAACATTGAAAACGTCCCAGCTCCTGCAATCGCCATAGACTACTGGCAAATGTCTCCGGACTCCACCTTgCGTGATGTTGTGATGGTGGTGAGAGCCGATGAGGCCCATCACCGaGATGTCAATCACTTCGCATCGGATGTACACTATCAAGGACGTGAACTGAGGGAGGCGCCAGCGCCAATTGGGTATCACTAA"};
     //char primer[] = "ATATTTTCTGGCCTACTTGG";
 
-    char* targets[m] = {"CGT"}; //CGTTGA
-    char primer[] = "CGT"; //CGTTGA
+    // 5' to 3'
+    char* targets[m] = {"AACAAAGTT"}; //CGTTGA
+    // 3' to 5' 
+    char primer[] = "TTGAAACAA"; //CGTTGA
 
     for(int p = 0; p < m; p++)
     {
         char *target = targets[p];
         //float temperature = calculateMeltingTemperature(target, primer, params); // SLOW!!!
         //printf("Temp (C): %.2f\n", temperature);
-        char *complement = calculateComplement(primer, strlen(primer));
-        BasePair *pairs = calculateThermodynamicAlignment(target, complement, params);
+        // char *complement = calculate_complement(primer, strlen(primer));
+        BasePair *pairs = calculate_thermodynamic_alignment(target, &primer[0], &params);
         //printf("Tm = %.2f °C \n", thermodynamic->meltingTemperature);
         //printf("dH = %.2f Kcal/mol\n", thermodynamic->dH/1000);
         //printf("dS = %.2f e.u (cal/K.mol)\n", thermodynamic->dS);
